@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { View, Text, FlatList, TouchableOpacity, Alert, StyleSheet } from "react-native";
 import api from '../axios/axios'; // Certifique-se de que o caminho está correto
 
-export default function Home ({ navigation }) {
+ function Salas ({ navigation }) {
   const [salas, setSalas] = useState([]);
 
   useEffect(() => {
@@ -63,3 +63,4 @@ const styles = StyleSheet.create({
     color: '#333',
   },
 });
+export default Salas;

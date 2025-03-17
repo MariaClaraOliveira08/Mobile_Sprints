@@ -7,7 +7,7 @@ import {
   Alert,
   StyleSheet,
 } from "react-native";
-import api from '../axios/axios'; // Certifique-se de que o caminho está correto
+import api from "../axios/axios"; // Certifique-se de que o caminho está correto
 
 export default function Login({ navigation }) {
   const [cpf, setCpf] = useState("");
@@ -19,10 +19,10 @@ export default function Login({ navigation }) {
 
     try {
       const response = await api.postLogin(user); // Chame a API
-      Alert.alert('OK', response.data.message); // Exiba a mensagem de sucesso
+      Alert.alert("OK", response.data.message); // Exiba a mensagem de sucesso
     } catch (error) {
       console.log(error); // Para depuração
-      Alert.alert('Erro', error.response?.data?.error || "Erro desconhecido"); // Exiba a mensagem de erro
+      Alert.alert("Erro", error.response?.data?.error || "Erro desconhecido"); // Exiba a mensagem de erro
     }
   }
 
@@ -45,8 +45,8 @@ export default function Login({ navigation }) {
       <TouchableOpacity onPress={handleLogin} style={styles.button}>
         <Text style={styles.buttonText}>Entrar</Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => navigation.navigate("Home")}>
-        <Text style={styles.linkText}>Já tem uma conta? Cadastre-se</Text>
+      <TouchableOpacity onPress={() => navigation.navigate("Salas")}>
+        <Text style={styles.linkText}>Cadastre-se</Text>
       </TouchableOpacity>
     </View>
   );
@@ -57,38 +57,38 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: '#8b0b1e',
+    backgroundColor: "#8b0b1e",
     padding: 20,
   },
   title: {
     fontSize: 28,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 20,
-    color: '#cbbcc0',
+    color: "#cbbcc0",
   },
   input: {
-    width: '100%',
+    width: "100%",
     height: 40,
     borderBottomWidth: 1,
     marginBottom: 20,
     paddingHorizontal: 10,
-    backgroundColor: '#e3dbdd',
+    backgroundColor: "#e3dbdd",
     borderRadius: 20,
   },
   button: {
-    backgroundColor: '#b9526c',
+    backgroundColor: "#b9526c",
     padding: 10,
     borderRadius: 5,
-    width: '100%',
-    alignItems: 'center',
+    width: "100%",
+    alignItems: "center",
   },
   buttonText: {
-    fontWeight: 'bold',
-    color: '#cbbcc0',
+    fontWeight: "bold",
+    color: "#cbbcc0",
   },
   linkText: {
     marginTop: 10,
-    color: '#cbbcc0',
-    fontWeight: 'bold',
+    color: "#cbbcc0",
+    fontWeight: "bold",
   },
 });
