@@ -1,129 +1,144 @@
 import React, { useState } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  Alert,
-  StyleSheet,
-} from "react-native";
-import api from "../axios/axios";
+import { Link } from "react-router-dom";
+import Button from "@mui/material/Button";
+import CssBaseline from "@mui/material/CssBaseline";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Container from "@mui/material/Container";
+import TextField from "@mui/material/TextField";
+import api from "../axios/axios"; // Certifique-se de que o caminho está correto
 
-export default function Cadastro({ navigation }) {
+function Cadastro() {
   const [user, setUser ] = useState({
     name: "",
     cpf: "",
     email: "",
-    password: "",
-    
+    password: ""
   });
 
-  async function handleCadastro() {
-    await api.postCadastro(user).then(
-      (response) => {
-        Alert.alert("Cadastro realizado com sucesso!!", response.data.message);
-      },
-      (error) => {
-        Alert.alert('Erro', error.response.data.error);
-      }
-    );
+  const onChange = (event) => {
+    const { name, value } = event.target;
+    setUser ({ ...user, [name]: value });
+  };
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    if (validateForm()) {
+      performCadastro(); // Chame a função de cadastro
+    }
+  };
+
+  const validateForm = () => {
+    if (!user.name || !user.cpf || !user.email || !user.password) {
+      alert("Por favor, preencha todos os campos.");
+      return false;
+    }
+    return true;
+  };
+
+  async function performCadastro() { // Renomeie a função para evitar conflitos
+    try {
+      const response = await api.post("/user/"); // Ajuste o endpoint conforme necessário
+      alert(response.data.message);
+      // Limpar o formulário após o cadastro
+      setUser ({
+        name: "",
+        cpf: "",
+        email: "",
+        password: ""
+      });
+    } catch (error) {
+      console.log(error);
+      alert(error.response?.data?.error || "Erro desconhecido");
+    }
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Faça Seu Cadastro</Text>
+    <div style={{
+      backgroundImage: "url('/Imagem_de_fundo.jpg')",
+      backgroundSize: "cover",
+      backgroundPosition: "center",
+      height: "100vh",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center"
+    }}>
+      <Container component="main" maxWidth="xs" style={{ backgroundColor: "white", borderRadius: 20, padding: 20, boxShadow: "0 4px 8px rgba(0,0,0,0.2)" }}>
+        <CssBaseline />
+        <Box display="flex" flexDirection="column" alignItems="center">
+          <Typography component="h1" variant="h5" style={{ color: "#d40000", fontWeight: "bold", marginBottom: 10 }}>
+            CRIE SUA CONTA
+          </Typography>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Nome"
-        value={user.name}
-        onChangeText={(value) => {
-          setUser ({ ...user, name: value });
-        }}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="CPF"
-        value={user.cpf}
-        onChangeText={(value) => {
-          setUser ({ ...user, cpf: value });
-        }}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        value={user.email}
-        onChangeText={(value) => {
-          setUser ({ ...user, email: value });
-        }}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Senha"
-        value={user.password}
-        onChangeText={(value) => {
-          setUser ({ ...user, password: value });
-        }}
-      />
+          <Box component="form" onSubmit={handleSubmit} noValidate>
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              label="Nome"
+              type="text"
+              name="name"
+              value={user.name}
+              onChange={onChange}
+              style={{ backgroundColor: "#f9f9f9", borderRadius: 5 }}
+            />
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              label="CPF"
+              type="text"
+              name="cpf"
+              value={user.cpf}
+              onChange={onChange}
+              style={{ backgroundColor: "#f9f9f9", borderRadius: 5 }}
+            />
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              label="E-mail"
+              type="email"
+              name="email"
+              value={user.email}
+              onChange={onChange}
+              style={{ backgroundColor: "#f9f9f9", borderRadius: 5 }}
+            />
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              label="Senha"
+              type="password"
+              name="password"
+              value={user.password}
+              onChange={onChange}
+              style={{ backgroundColor: "#f9f9f9", borderRadius: 5 }}
+            />
 
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity onPress={handleCadastro} style={styles.button}>
-          <Text style={styles.linkText}>Cadastre-se</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate("Login")}>
-          <Text style={styles.linkText}>Já tem uma conta?</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              style={{ backgroundColor: "#d40000", color: "white", fontWeight: "bold", marginTop: 10 }}
+            >
+              Cadastrar
+            </Button>
+
+            <Button
+              component={Link}
+              to="/"
+              fullWidth
+              variant="contained"
+              style={{ backgroundColor: "#d40000", color: "white", fontWeight: "bold", marginTop: 10 }}
+            >
+              Já tem uma conta? Faça login
+            </Button>
+          </Box>
+        </Box>
+      </Container>
+    </div>
   );
 }
 
-const styles = StyleSheet.create({
-  container: { // fundo
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: '#8b0b1e',
-    padding: 20,
-  },
-  title: {  // título (faça seu cadastro)
-    fontSize: 28,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    color: '#cbbcc0'
-  },
-  input: { //campos a serem preenchidos
-    width: '100%',
-    height: 40,
-    borderBottomWidth: 1,
-    marginBottom: 20,
-    paddingHorizontal: 10,
-    backgroundColor: '#e3dbdd',
-    borderRadius: 20,
-  },
-
-  buttonContainer: { //Botão do cadastre-se
-    width: '100%',
-    alignItems: 'center',
-    marginTop: 20, 
-    
-  }, 
-
-  button: {
-    backgroundColor: '#b9526c',
-    padding: 10,
-    borderRadius: 5,
-    width: '100%', // Largura total do botão
-    alignItems: 'center',
-  },
-
-  buttonText: { //Cadastre-se
-    fontWeight: 'bold',
-    color: '#cbbcc0',
-  },
-  linkText: { //Já tem conta
-    marginTop: 10, // Espaço acima do texto "Já tem uma conta?"
-    color: '#cbbcc0', // Cor do texto do link
-    fontWeight: 'bold',
-  },
-});
+export default Cadastro;
