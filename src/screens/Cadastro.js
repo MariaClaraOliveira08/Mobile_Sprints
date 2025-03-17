@@ -12,10 +12,10 @@ import api from "../axios/axios";
 export default function Cadastro({ navigation }) {
   const [user, setUser ] = useState({
     name: "",
+    cpf: "",
     email: "",
     password: "",
-    cpf: "",
-    data_nascimento: "",
+    
   });
 
   async function handleCadastro() {
@@ -32,20 +32,13 @@ export default function Cadastro({ navigation }) {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Faça Seu Cadastro</Text>
+
       <TextInput
         style={styles.input}
         placeholder="Nome"
         value={user.name}
         onChangeText={(value) => {
           setUser ({ ...user, name: value });
-        }}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        value={user.email}
-        onChangeText={(value) => {
-          setUser ({ ...user, email: value });
         }}
       />
       <TextInput
@@ -58,24 +51,24 @@ export default function Cadastro({ navigation }) {
       />
       <TextInput
         style={styles.input}
+        placeholder="Email"
+        value={user.email}
+        onChangeText={(value) => {
+          setUser ({ ...user, email: value });
+        }}
+      />
+      <TextInput
+        style={styles.input}
         placeholder="Senha"
         value={user.password}
         onChangeText={(value) => {
           setUser ({ ...user, password: value });
         }}
       />
-      <TextInput
-        style={styles.input}
-        placeholder="Data de Nascimento"
-        value={user.data_nascimento}
-        onChangeText={(value) => {
-          setUser ({ ...user, data_nascimento: value });
-        }}
-      />
 
       <View style={styles.buttonContainer}>
         <TouchableOpacity onPress={handleCadastro} style={styles.button}>
-          <Text style={styles.buttonText}>Cadastre-se</Text>
+          <Text style={styles.linkText}>Cadastre-se</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => navigation.navigate("Login")}>
           <Text style={styles.linkText}>Já tem uma conta?</Text>
@@ -93,22 +86,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#8b0b1e',
     padding: 20,
   },
-  whiteBox: {
-    width: '100%',
-    maxWidth: 400, // Largura máxima do campo branco
-    backgroundColor: '#FFFFFF', // Cor de fundo branca
-    borderRadius: 10, // Bordas arredondadas
-    padding: 20, // Espaçamento interno
-      width: 0,
-      height: 2,
-    },
   title: {  // título (faça seu cadastro)
     fontSize: 28,
     fontWeight: 'bold',
     marginBottom: 20,
-    color: '#cbbcc0',
+    color: '#cbbcc0'
   },
-  input: { // campos que vão ser preenchidos
+  input: { //campos a serem preenchidos
     width: '100%',
     height: 40,
     borderBottomWidth: 1,
@@ -117,11 +101,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#e3dbdd',
     borderRadius: 20,
   },
-  buttonContainer: {
+
+  buttonContainer: { //Botão do cadastre-se
     width: '100%',
     alignItems: 'center',
     marginTop: 20, 
-  }, // Adicione a chave de fechamento aqui
+    
+  }, 
+
   button: {
     backgroundColor: '#b9526c',
     padding: 10,
@@ -129,10 +116,12 @@ const styles = StyleSheet.create({
     width: '100%', // Largura total do botão
     alignItems: 'center',
   },
-  buttonText: {
+
+  buttonText: { //Cadastre-se
     fontWeight: 'bold',
+    color: '#cbbcc0',
   },
-  linkText: {
+  linkText: { //Já tem conta
     marginTop: 10, // Espaço acima do texto "Já tem uma conta?"
     color: '#cbbcc0', // Cor do texto do link
     fontWeight: 'bold',
