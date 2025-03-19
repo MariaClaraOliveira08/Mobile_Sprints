@@ -20,6 +20,7 @@ export default function Login({ navigation }) {
     try {
       const response = await api.postLogin(user); // Chame a API
       Alert.alert("OK", response.data.message); // Exiba a mensagem de sucesso
+      navigation.navigate("Salas");
     } catch (error) {
       console.log(error); // Para depuração
       Alert.alert("Erro", error.response?.data?.error || "Erro desconhecido"); // Exiba a mensagem de erro
@@ -45,7 +46,7 @@ export default function Login({ navigation }) {
       <TouchableOpacity onPress={handleLogin} style={styles.button}>
         <Text style={styles.buttonText}>Entrar</Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => navigation.navigate("Cadastro")}>
+      <TouchableOpacity onPress={() => navigation.navigate("Salas")}>
         <Text style={styles.linkText}>Cadastre-se</Text>
       </TouchableOpacity>
     </View>
