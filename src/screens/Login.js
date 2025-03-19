@@ -45,7 +45,7 @@ export default function Login({ navigation }) {
       <TouchableOpacity onPress={handleLogin} style={styles.button}>
         <Text style={styles.buttonText}>Entrar</Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => navigation.navigate("Salas")}>
+      <TouchableOpacity onPress={() => navigation.navigate("Cadastro")}>
         <Text style={styles.linkText}>Cadastre-se</Text>
       </TouchableOpacity>
     </View>

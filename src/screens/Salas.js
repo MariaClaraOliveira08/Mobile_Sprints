@@ -1,38 +1,46 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, FlatList, TouchableOpacity, Alert, StyleSheet } from "react-native";
-import api from '../axios/axios'; // Certifique-se de que o caminho está correto
+import { View, Text, StyleSheet, Alert, ScrollView } from "react-native";
+import api from "../axios/axios"; // Certifique-se de que o caminho está correto
 
- function Salas ({ navigation }) {
+function ListSalas() {
   const [salas, setSalas] = useState([]);
 
-  useEffect(() => {
-    fetchSalas();
-  }, []);
-
-  const fetchSalas = async () => {
+  async function getSalas() {
     try {
-      const response = await api.get("/classroom/"); // Ajuste o endpoint conforme necessário
-      setSalas(response.data); // Supondo que a resposta seja um array de salas
+      const response = await api.getSalas();
+      console.log(response.data.classrooms);
+      setSalas(response.data.classrooms);
     } catch (error) {
-      console.log(error);
-      Alert.alert('Erro', error.response?.data?.error || "Erro ao buscar salas");
+      console.log("Erro ", error);
+      Alert.alert("Erro", "Erro ao buscar salas");
     }
-  };
+  }
 
-  const renderSala = ({ item }) => (
-    <TouchableOpacity style={styles.salaItem} onPress={() => navigation.navigate("DetalhesSala", { salaId: item.id })}>
-      <Text style={styles.salaText}>{item.nome}</Text> {/* Supondo que cada sala tenha um campo 'nome' */}
-    </TouchableOpacity>
-  );
+  useEffect(() => {
+    getSalas();
+  }, []);
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Salas de Aula</Text>
-      <FlatList
-        data={salas}
-        renderItem={renderSala}
-        keyExtractor={(item) => item.id.toString()} // Supondo que cada sala tenha um campo 'id'
-      />
+      <View style={styles.tableHeader}>
+        <Text style={styles.headerCell}>Número</Text>
+        <Text style={styles.headerCell}>Descrição</Text>
+        <Text style={styles.headerCell}>Capacidade</Text>
+      </View>
+      <ScrollView>
+        {salas.map((sala, index) => {
+          // Adicionando a alternância de cor de fundo para as linhas
+          const backgroundColor = index % 2 === 0 ? "#FFD9D9" : "#FFFFFF"; // Rosa claro para linhas pares
+          return (
+            <View key={sala.id_sala} style={[styles.row, { backgroundColor }]}>
+              <Text style={styles.cell}>{sala.number}</Text>
+              <Text style={styles.cell}>{sala.description}</Text>
+              <Text style={styles.cell}>{sala.capacity}</Text>
+            </View>
+          );
+        })}
+      </ScrollView>
     </View>
   );
 }
@@ -40,27 +48,43 @@ import api from '../axios/axios'; // Certifique-se de que o caminho está corret
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: '#8b0b1e',
     padding: 20,
+    backgroundColor: "#FFCCCB",
   },
   title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    color: '#cbbcc0',
+    textAlign: "center",
+    marginBottom: 16,
+    color: "#B22222",
+    fontFamily: "sans-serif",
+    fontWeight: "bold",
+    fontSize: 36,
   },
-  salaItem: {
-    backgroundColor: '#e3dbdd',
-    padding: 15,
-    borderRadius: 10,
-    marginVertical: 5,
-    width: '100%',
+  tableHeader: {
+    flexDirection: "row",
+    backgroundColor: "#ff6347",
+    padding: 10,
+    borderRadius: 5,
+    marginBottom: 10,
   },
-  salaText: {
+  headerCell: {
+    flex: 1,
+    textAlign: "center",
+    color: "#fff",
+    fontWeight: "bold",
     fontSize: 18,
-    color: '#333',
+  },
+  row: {
+    flexDirection: "row",
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ccc",
+  },
+  cell: {
+    flex: 1,
+    textAlign: "center",
+    fontWeight: "bold",
+    fontSize: 16,
   },
 });
-export default Salas;
+
+export default ListSalas;
