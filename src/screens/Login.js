@@ -29,26 +29,31 @@ export default function Login({ navigation }) {
 
   return (
     <View style={styles.container}>
+
       <Text style={styles.title}>Faça Seu Login</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="CPF"
-        value={cpf}
-        onChangeText={setCpf}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Senha"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-      />
-      <TouchableOpacity onPress={handleLogin} style={styles.button}>
-        <Text style={styles.buttonText}>Entrar</Text>
-      </TouchableOpacity>
-      <TouchableOpacity onPress={() => navigation.navigate("Salas")}>
-        <Text style={styles.linkText}>Cadastre-se</Text>
-      </TouchableOpacity>
+
+      {/* Container que envolve os inputs, botão e link de cadastro */}
+      <View style={styles.inputContainer}>
+        <TextInput
+          style={styles.input}
+          placeholder="CPF"
+          value={cpf}
+          onChangeText={setCpf}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Senha"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+        />
+        <TouchableOpacity onPress={handleLogin} style={styles.button}>
+          <Text style={styles.buttonText}>Entrar</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate("Cadastro")}>
+          <Text style={styles.linkText}>Cadastre-se</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -67,29 +72,52 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     color: "#cbbcc0",
   },
-  input: {
-    width: "100%",
-    height: 40,
-    borderBottomWidth: 1,
-    marginBottom: 20,
-    paddingHorizontal: 10,
-    backgroundColor: "#e3dbdd",
-    borderRadius: 20,
+  inputContainer: {
+    width: "100%", // Usando largura total da tela
+    backgroundColor: "#e6e1e1", // Cor de fundo do container
+    padding: 16, // Aumentei o padding para dar mais espaçamento
+    borderRadius: 15, // Bordas arredondadas
+    marginBottom: 30, // Aumentei o espaço entre o container e o botão
+    shadowColor: "#362121", // Cor da sombra
+    shadowOpacity: 0.34, // Sombra sutil
+    shadowRadius: 26, // Raio da sombra
+    elevation: 15, // Sombra no Android
+    alignItems: "center", // Centralizando os itens
   },
+  input: {
+    width: "100%", // Largura ajustada para 80% da tela para um input mais longo
+    height: 50, // Aumentando a altura dos inputs
+    borderBottomWidth: 1,
+    marginBottom: 20, // Maior espaçamento entre os inputs
+    paddingHorizontal: 15, // Mais padding para os textos
+    backgroundColor: "#fff", // Fundo branco para os inputs
+    borderRadius: 25, // Bordas mais arredondadas
+    fontSize: 16, // Aumentando o tamanho da fonte
+    alignSelf: "center", // Centraliza o input horizontalmente
+  },
+  
   button: {
-    backgroundColor: "#b9526c",
-    padding: 10,
-    borderRadius: 5,
-    width: "100%",
+    backgroundColor: "#F92F2B",
+    paddingVertical: 15, // Aumentei o padding vertical para o botão ficar mais longo
+    paddingHorizontal: 20, // Ajustando o padding horizontal para mais largura
+    borderRadius: 25, // Bordas bem arredondadas
+    width: "89%", // Usando largura total da tela
     alignItems: "center",
+    marginBottom: 20, // Espaçamento entre o botão e outros elementos
+    shadowColor: "#000", // Sombra para dar destaque ao botão
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 6, // Sombra do botão entrar
   },
   buttonText: {
     fontWeight: "bold",
-    color: "#cbbcc0",
+    color: "#faf7f7",
+    fontSize: 18, // Aumentando o tamanho da fonte do botão
   },
+  
   linkText: {
     marginTop: 10,
-    color: "#cbbcc0",
+    color: "#8a8383",
     fontWeight: "bold",
   },
 });
