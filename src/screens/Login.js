@@ -8,24 +8,28 @@ import {
   StyleSheet,
 } from "react-native";
 import api from "../axios/axios"; // Certifique-se de que o caminho está correto
+import {useNavigation} from "@react-navigation/native";
 
-export default function Login({ navigation }) {
-  const [cpf, setCpf] = useState("");
-  const [password, setPassword] = useState("");
+export default function Login({}) {
+  const navigation = useNavigation();
+    const [user, setUser] = useState({ 
+        email: "",
+        password: "",
+        showPassword: false,
+    });
 
-  async function handleLogin() {
-    const user = { cpf, password }; // Crie o objeto user com cpf e password
-    console.log(user); // Para depuração
-
-    try {
-      const response = await api.postLogin(user); // Chame a API
-      Alert.alert("OK", response.data.message); // Exiba a mensagem de sucesso
-      navigation.navigate("Salas");
-    } catch (error) {
-      console.log(error); // Para depuração
-      Alert.alert("Erro", error.response?.data?.error || "Erro desconhecido"); // Exiba a mensagem de erro
-    }
+    async function handleLogin(){
+      console.log(user)
+      await api.postLogin(user).then( //solicitação
+          (response)=>{
+              Alert.alert('OK', response.data.message)
+          },(error)=>{
+              Alert.alert('Erro', error.response.data.error)
+          }
+    )
   }
+}
+
 
   return (
     <View style={styles.container}>
@@ -40,12 +44,15 @@ export default function Login({ navigation }) {
           value={cpf}
           onChangeText={setCpf}
         />
+        <View style={styles.passwordContainer}>
         <TextInput
-          style={styles.input}
-          placeholder="Senha"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
+        style={styles.passwordInput}
+        placeholder="Senha"
+        value={user.password}
+        secureTextEntry={user.showPassword}
+        onChangeText={(value)=> {
+            setUser({...user, password: value});
+        }}
         />
         <TouchableOpacity onPress={handleLogin} style={styles.button}>
           <Text style={styles.buttonText}>Entrar</Text>
@@ -56,8 +63,9 @@ export default function Login({ navigation }) {
       </View>
     </View>
   );
-}
 
+
+{}
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -120,4 +128,4 @@ const styles = StyleSheet.create({
     color: "#8a8383",
     fontWeight: "bold",
   },
-});
+})

@@ -14,25 +14,17 @@ export default function Cadastro({ navigation }) {
   const [cpf, setCpf] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const user = { name, cpf, email, password }; 
 
   async function handleCadastro() {
-    const user = { name, cpf, email, password }; 
-    console.log(user);
-
-    // Verifica se os campos estão vazios antes de fazer a chamada à API
-    if (!name || !cpf || !email || !password) {
-      Alert.alert("Erro", "Por favor, preencha todos os campos.");
-      return; // Interrompe a execução se algum campo estiver vazio
-    }
-
-    try {
-      const response = await api.postCadastro(user); 
-      Alert.alert("OK", response.data.message); 
-      navigation.navigate("Login"); 
-    } catch (error) {
-      console.log(error); 
-      Alert.alert("Erro", error.response?.data?.error || "Erro ao cadastrar"); 
-    }
+    await api.postCadastro(user).then(
+      (response) => {
+        Alert.alert("Cadastro realizado com sucesso!!", response.data.message);
+      },
+      (error) => {
+        Alert.alert('Erro', error.response.data.error);
+      }
+    );
   }
 
   return (
