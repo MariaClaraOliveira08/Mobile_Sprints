@@ -10,18 +10,24 @@ import {
   Image,
   ImageBackground,
 } from "react-native";
-import api from "../axios/axios";  // Importa a instância do axios para fazer as requisições
-import { useNavigation } from "@react-navigation/native";  // Importa a navegação para poder mudar de tela
-import { Ionicons } from "@expo/vector-icons";  // Importa os ícones do Ionicons
+// Importa a instância do axios para fazer as requisições
+import api from "../axios/axios";  
+
+// Importa a navegação para poder mudar de tela
+import { useNavigation } from "@react-navigation/native";  
+
+// Importa os ícones do Ionicons
+import { Ionicons } from "@expo/vector-icons";  
+
 
 export default function Cadastro({ navigation }) {
   // Estado que mantém os dados do usuário para cadastro
   const [user, setUser] = useState({
-    name: "",      // Nome do usuário
-    cpf: "",       // CPF do usuário
-    email: "",     // E-mail do usuário
-    password: "",  // Senha do usuário
-    showPassword: false,  // Controla se a senha será visível ou não
+    name: "",      
+    cpf: "",       
+    email: "",     
+    password: "",
+    showPassword: false,  
   });
 
   // Função responsável por enviar os dados do cadastro para a API
@@ -43,15 +49,15 @@ export default function Cadastro({ navigation }) {
   return (
     // Define a imagem de fundo da tela
     <ImageBackground
-      source={require("../../assets/Imagem_de_fundo.jpg")}  // Caminho da imagem de fundo
+      source={require("../../assets/Imagem_de_fundo.jpg")}  
       style={styles.background}
     >
       {/* Container para o logo da aplicação */}
       <View style={styles.logoContainer}>
         <Image
-          source={require("../../assets/logo-senai-1.png")}  // Caminho do logo
+          source={require("../../assets/logo-senai-1.png")}  
           style={styles.logo}
-          resizeMode="contain"  // Ajusta o logo dentro do container sem distorção
+          resizeMode="contain"  
         />
       </View>
 
@@ -64,43 +70,43 @@ export default function Cadastro({ navigation }) {
           {/* Campo de entrada para o nome */}
           <TextInput
             style={styles.input}
-            placeholder="Nome"  // Placeholder para o campo de nome
+            placeholder="Nome"  
             value={user.name}
-            onChangeText={(value) => setUser({ ...user, name: value })}  // Atualiza o estado com o valor do campo
+            onChangeText={(value) => setUser({ ...user, name: value })}  
           />
           
           {/* Campo de entrada para o CPF */}
           <TextInput
             style={styles.input}
-            placeholder="CPF"  // Placeholder para o campo de CPF
+            placeholder="CPF"  
             value={user.cpf}
-            onChangeText={(value) => setUser({ ...user, cpf: value })}  // Atualiza o estado com o valor do campo
+            onChangeText={(value) => setUser({ ...user, cpf: value })} 
           />
           
           {/* Campo de entrada para o e-mail */}
           <TextInput
             style={styles.input}
-            placeholder="E-mail"  // Placeholder para o campo de e-mail
+            placeholder="E-mail"  
             value={user.email}
-            onChangeText={(value) => setUser({ ...user, email: value })}  // Atualiza o estado com o valor do campo
+            onChangeText={(value) => setUser({ ...user, email: value })}  
           />
           
           {/* Container para o campo de senha e o ícone de olho para mostrar/esconder a senha */}
           <View style={styles.passwordContainer}>
             <TextInput
               style={styles.passwordInput}
-              placeholder="Senha"  // Placeholder para o campo de senha
+              placeholder="Senha"  
               value={user.password}
-              secureTextEntry={user.showPassword}  // Controla se a senha será visível ou não
-              onChangeText={(value) => setUser({ ...user, password: value })}  // Atualiza o estado com o valor do campo
+              secureTextEntry={user.showPassword}  
+              onChangeText={(value) => setUser({ ...user, password: value })} 
             />
 
             {/* Ícone para alternar entre mostrar/esconder a senha */}
             <TouchableOpacity
-              onPress={() => setUser({ ...user, showPassword: !user.showPassword })}  // Alterna o estado de visibilidade da senha
+              onPress={() => setUser({ ...user, showPassword: !user.showPassword })}  
             >
               <Ionicons
-                name={user.showPassword ? "eye-off" : "eye"}  // Define o ícone de olho aberto ou fechado
+                name={user.showPassword ? "eye-off" : "eye"}  
                 size={24}
                 color="gray"
               />
