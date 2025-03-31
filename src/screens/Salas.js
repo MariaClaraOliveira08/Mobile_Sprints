@@ -11,7 +11,6 @@ function ListSalas() {
       console.log(response.data.classrooms);
       setSalas(response.data.classrooms);
     } catch (error) {
-      console.log("Erro ", error);
       Alert.alert("Erro", "Erro ao buscar salas");
     }
   }

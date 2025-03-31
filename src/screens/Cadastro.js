@@ -32,12 +32,14 @@ export default function Cadastro({ navigation }) {
 
   // Função responsável por enviar os dados do cadastro para a API
   async function handleCadastro() {
+    console.log(user); 
     // Chama a função de cadastro da API e faz o tratamento da resposta
     await api.postCadastro(user).then(
       (response) => {
         // Se o cadastro for bem-sucedido, exibe uma mensagem e navega para a tela de Login
         Alert.alert("Cadastro realizado com sucesso!!", response.data.message);
-        navigation.navigate("Login");  // Navega para a tela de login após o cadastro
+        // Navega para a tela de login após o cadastro
+        navigation.navigate("Login");  
       },
       (error) => {
         // Se houver erro, exibe uma mensagem de erro
@@ -57,13 +59,15 @@ export default function Cadastro({ navigation }) {
         <Image
           source={require("../../assets/logo-senai-1.png")}  
           style={styles.logo}
+          //Para se ajustar dentro do contêiner
           resizeMode="contain"  
         />
       </View>
 
       {/* Container principal de conteúdo */}
       <View style={styles.container}>
-        <Text style={styles.title}>Faça Seu Cadastro</Text>  {/* Título da tela */}
+        {/* Título da tela */}
+        <Text style={styles.title}>Faça Seu Cadastro</Text>  
 
         {/* Container que mantém os campos de entrada */}
         <View style={styles.inputContainer}>
@@ -103,6 +107,8 @@ export default function Cadastro({ navigation }) {
 
             {/* Ícone para alternar entre mostrar/esconder a senha */}
             <TouchableOpacity
+            // Mantém as outras propriedades de 'user' intactas. (...user)
+            // Altera o valor de 'showPassword' (inverte de true para false ou vice-versa).
               onPress={() => setUser({ ...user, showPassword: !user.showPassword })}  
             >
               <Ionicons
@@ -130,90 +136,114 @@ export default function Cadastro({ navigation }) {
 
 // Estilos para os componentes da tela
 const styles = StyleSheet.create({
+  // Container principal que ocupa toda a tela
   container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "transparent",
-    padding: 20,
+    flex: 1, // O container ocupa todo o espaço disponível
+    justifyContent: "center", // Centraliza o conteúdo verticalmente
+    alignItems: "center", // Centraliza o conteúdo horizontalmente
+    backgroundColor: "transparent", // Define o fundo como transparente
+    padding: 20, // Adiciona um padding interno de 20 unidades ao redor do conteúdo
   },
+  
+  // Estilo para o título principal
   title: {
-    fontSize: 28,
-    fontWeight: "bold",
-    marginBottom: 20,
-    color: "#F92F2B",
+    fontSize: 28, // Tamanho grande para o texto do título
+    fontWeight: "bold", // Aplica negrito ao título
+    marginBottom: 20, // Adiciona um espaço de 20 unidades abaixo do título
+    color: "#F92F2B", // Define a cor do título como vermelho
   },
+
+  // Container que envolve o campo de entrada de texto
   inputContainer: {
-    width: "100%",
-    marginBottom: 30,
-    backgroundColor: "#FEFEFE",
-    padding: 16,
-    borderRadius: 15,
-    shadowColor: "#362121",
-    shadowOpacity: 0.34,
-    shadowRadius: 26,
-    elevation: 15,
-    alignItems: "center",
+    width: "100%", // O container ocupa toda a largura disponível
+    marginBottom: 30, // Adiciona um espaço de 30 unidades abaixo do container
+    backgroundColor: "#FEFEFE", // Fundo branco claro para o container
+    padding: 16, // Cria um espaçamento interno de 16 unidades
+    borderRadius: 15, // Arredonda os cantos do container
+    // Sombra para dar efeito de profundidade no container
+    shadowColor: "#362121", //sombra do container
+    elevation: 15, // Eleva o container com sombra, criando um efeito de profundidade
+    alignItems: "center", // Centraliza os itens dentro do container
   },
+
+  // Estilo do campo de entrada de texto
   input: {
-    width: "100%",
-    height: 50,
-    marginBottom: 20,
-    paddingHorizontal: 10,
-    backgroundColor: "#F5F5F5",
-    borderRadius: 20,
-    fontSize: 16,
+    width: "100%", // O campo de entrada ocupa toda a largura do container
+    height: 50, // Define a altura do campo para 50 unidades
+    marginBottom: 20, // Adiciona um espaço de 20 unidades abaixo do campo de entrada
+    paddingHorizontal: 10, // Cria um espaço de 10 unidades nas laterais
+    backgroundColor: "#F5F5F5", // Fundo cinza claro para o campo de entrada
+    borderRadius: 20, // Arredonda os cantos do campo de entrada
+    fontSize: 16, // Define o tamanho da fonte para o texto inserido
   },
+
+  // Container para o campo de senha (com ícone ou ação ao lado)
   passwordContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    width: "100%",
-    paddingRight: 10,
-    marginBottom: 20,
-    paddingHorizontal: 15,
-    backgroundColor: "#F5F5F5",
-    borderRadius: 25,
-    fontSize: 16,
-    alignSelf: "center",
+    flexDirection: "row", // Organiza os itens dentro do container na horizontal
+    alignItems: "center", // Alinha os itens verticalmente no centro
+    width: "100%", // O container ocupa toda a largura
+    paddingRight: 18, // Adiciona um padding à direita
+    marginBottom: 20, // Adiciona um espaço abaixo do container
+    paddingHorizontal: 15, // Cria um espaçamento interno nas laterais
+    backgroundColor: "#F5F5F5", // Fundo cinza claro
+    borderRadius: 25, // Arredonda os cantos do container
+    fontSize: 16, // Define o tamanho da fonte para o texto inserido
+    alignSelf: "center", // Centraliza o container horizontalmente
   },
+
+  // Estilo do campo de entrada de senha
   passwordInput: {
-    flex: 1,
-    height: 50,
-    backgroundColor: "#F5F5F5",
-    borderRadius: 25,
-    fontSize: 16,
-    alignSelf: "center",
+    flex: 1, // O campo ocupa todo o espaço disponível dentro do container
+    height: 50, // Altura do campo de senha
+    backgroundColor: "#F5F5F5", // Fundo cinza claro
+    borderRadius: 25, // Arredonda os cantos
+    fontSize: 16, // Tamanho da fonte para o texto inserido
+    alignSelf: "center", // Centraliza o campo horizontalmente
   },
+
+  // Estilo para o botão de ação (login, submit, etc.)
   button: {
-    backgroundColor: "#F92F2B",
-    paddingVertical: 15,
-    paddingHorizontal: 20,
-    borderRadius: 25,
-    width: "100%",
-    alignItems: "center",
-    marginBottom: 20,
+    backgroundColor: "#F92F2B", // Fundo vermelho para o botão
+    paddingVertical: 15, // Padding de 15 unidades na direção vertical
+    paddingHorizontal: 20, // Padding de 20 unidades na direção horizontal
+    borderRadius: 25, // Arredonda os cantos do botão
+    width: "100%", // O botão ocupa toda a largura do container
+    alignItems: "center", // Centraliza o conteúdo dentro do botão
+    marginBottom: 20, // Adiciona um espaço de 20 unidades abaixo do botão
+    shadowColor: "#000", // Sombra para dar profundidade ao botão
+    elevation: 6, // Aplica uma sombra suave ao botão, fazendo-o parecer ligeiramente elevado
   },
+
+  // Estilo do texto dentro do botão
   buttonText: {
-    fontWeight: "bold",
-    color: "#faf7f7",
-    fontSize: 16,
+    fontWeight: "bold", // Aplica negrito ao texto
+    color: "#faf7f7", // Cor branca para o texto do botão
+    fontSize: 16, // Tamanho da fonte
   },
+
+  // Estilo para o texto de link ou mensagem auxiliar
   linkText: {
-    color: "#8a8383",
-    fontWeight: "bold",
-    textAlign: "center",
+    color: "#8a8383", // Cor cinza escuro para o texto do link
+    fontWeight: "bold", // Aplica negrito ao texto
+    textAlign: "center", // Centraliza o texto
   },
+
+  // Estilo do fundo da tela (para imagem de fundo)
   background: {
-    flex: 1,
-    resizeMode: "cover",
-    justifyContent: "center",
+    flex: 1, // O fundo ocupa toda a tela
+    resizeMode: "cover", // A imagem de fundo cobre a tela sem distorcer
+    justifyContent: "center", // Centraliza o conteúdo sobre o fundo
   },
+
+  // Container que envolve o logo
   logoContainer: {
-    marginBottom: -60,
-    alignItems: "center",
+    marginBottom: -60, // Adiciona um espaço negativo, movendo o logo para cima
+    alignItems: "center", // Centraliza o logo horizontalmente
   },
+
+  // Estilo do logo
   logo: {
-    width: 330,
-    height: 150,
+    width: 330, // Largura do logo
+    height: 150, // Altura do logo
   },
 });

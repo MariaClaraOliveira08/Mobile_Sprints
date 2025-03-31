@@ -19,23 +19,27 @@ export default function Login() {
 
   // Estado para armazenar os dados do usuário no login
   const [user, setUser] = useState({
-    email: "",     // Campo de e-mail do usuário
-    password: "",  // Campo de senha do usuário
-    showPassword: false,  // Controla se a senha será visível ou não
+    email: "",     
+    password: "",  
+    showPassword: false,  
   });
 
   // Função para lidar com o login do usuário
   async function handleLogin() {
-    console.log(user); // Exibe no console os dados preenchidos no login
+    // Exibe no console os dados preenchidos no login
+    console.log(user); 
 
     // Faz a requisição para a API enviando os dados do usuário
     await api.postLogin(user).then(
       (response) => {
-        Alert.alert("OK", response.data.message); // Exibe uma mensagem de sucesso
-        navigation.navigate("Salas"); // Redireciona o usuário para a tela "Salas"
+        // Exibe uma mensagem de sucesso
+        Alert.alert("OK", response.data.message);
+        // Redireciona o usuário para a tela "Salas" 
+        navigation.navigate("Salas"); 
       },
       (error) => {
-        Alert.alert("Erro", error.response.data.error); // Exibe uma mensagem de erro
+        // Exibe uma mensagem de erro
+        Alert.alert("Erro", error.response.data.error); 
       }
     );
   }
@@ -52,7 +56,8 @@ export default function Login() {
           <Image
             source={require("../../assets/logo-senai-1.png")}
             style={styles.logo}
-            resizeMode="contain" // Ajusta a imagem sem distorcer
+            // Ajusta a imagem sem distorcer
+            resizeMode="contain" 
           />
         </View>
 
@@ -75,7 +80,8 @@ export default function Login() {
               style={styles.passwordInput}
               placeholder="Senha"
               value={user.password}
-              secureTextEntry={user.showPassword} // Controla a visibilidade da senha
+              // Controla a visibilidade da senha
+              secureTextEntry={user.showPassword} 
               onChangeText={(value) => {
                 setUser({ ...user, password: value });
               }}
@@ -83,12 +89,15 @@ export default function Login() {
 
             {/* Botão para alternar a visibilidade da senha */}
             <TouchableOpacity
-              onPress={() =>
+              onPress={() =>  
+                // Mantém as outras propriedades de 'user' intactas. (...user)
+                // Altera o valor de 'showPassword' (inverte de true para false ou vice-versa).
                 setUser({ ...user, showPassword: !user.showPassword })
               }
             >
               <Ionicons
-                name={user.showPassword ? "eye-off" : "eye"} // Ícone de olho aberto/fechado
+              // "eye-off" para ocultar a senha, "eye" para mostrar.
+                name={user.showPassword ? "eye-off" : "eye"} 
                 size={24}
                 color="gray"
               />
@@ -112,97 +121,105 @@ export default function Login() {
 
 // Estilização da tela de login
 const styles = StyleSheet.create({
+  // Container principal da tela
   container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "transparent",
-    padding: 20,
+    flex: 1, // Ocupa todo o espaço disponível
+    justifyContent: "center", // Centraliza o conteúdo verticalmente
+    alignItems: "center", // Centraliza o conteúdo horizontalmente
+    backgroundColor: "transparent", // Fundo transparente
+    padding: 20, // Espaçamento interno de 20 unidades
   },
+  // Estilização do título principal
   title: {
-    fontSize: 28,
-    fontWeight: "bold",
-    marginBottom: 40,
-    color: "#F92F2B",
+    fontSize: 28, // Tamanho grande para o título
+    fontWeight: "bold", // Aplica negrito ao título
+    marginBottom: 40, // Espaço de 40 unidades abaixo do título
+    color: "#F92F2B", // Cor vermelha para o título
   },
+  // Container que envolve os campos de entrada
   inputContainer: {
-    width: "100%",
-    height: "35%",
-    backgroundColor: "#FEFEFE",
-    padding: 16,
-    borderRadius: 15,
-    marginBottom: 160,
-    shadowColor: "#362121",
-    shadowOpacity: 0.34,
-    shadowRadius: 26,
-    elevation: 15,
-    alignItems: "center",
+    width: "100%", // O container ocupa toda a largura da tela
+    height: "35%", // O container ocupa 35% da altura da tela
+    backgroundColor: "#FEFEFE", // Fundo branco
+    padding: 16, // Espaçamento interno de 16 unidades
+    borderRadius: 15, // Cantos arredondados
+    marginBottom: 160, // Grande espaço abaixo do container
+    shadowColor: "#362121", // Sombra para dar efeito de profundidade
+    elevation: 15, // Aplica uma sombra suave ao botão, fazendo-o parecer ligeiramente elevado
+    alignItems: "center", // Centraliza os itens dentro do container
   },
+  // Estilização dos campos de entrada de texto
   input: {
-    width: "100%",
-    height: 50, 
-    marginBottom: 20,
-    paddingHorizontal: 15,
-    backgroundColor: "#F5F5F5",
-    borderRadius: 25,
-    fontSize: 16,
-    alignSelf: "center",
+    width: "100%", // O campo ocupa toda a largura do container
+    height: 50, // Altura de 50 unidades
+    marginBottom: 20, // Espaço de 20 unidades abaixo do campo
+    paddingHorizontal: 15, // Espaçamento interno nas laterais
+    backgroundColor: "#F5F5F5", // Fundo cinza claro
+    borderRadius: 25, // Cantos arredondados
+    fontSize: 16, // Tamanho da fonte
+    alignSelf: "center", // Centraliza o campo horizontalmente
   },
+  // Container para o campo de senha
   passwordContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    width: "100%",
-    height: 50, 
-    paddingRight: 10,
-    marginBottom: 20,
-    paddingHorizontal: 15,
-    backgroundColor: "#F5F5F5",
-    borderRadius: 25,
-    fontSize: 16,
-    alignSelf: "center",
+    flexDirection: "row", // Organiza os itens na horizontal
+    alignItems: "center", // Centraliza os itens verticalmente
+    width: "100%", // O container ocupa toda a largura
+    height: 50, // Altura de 50 unidades
+    paddingRight: 10, // Padding à direita
+    marginBottom: 20, // Espaço abaixo do container
+    paddingHorizontal: 15, // Espaçamento nas laterais
+    backgroundColor: "#F5F5F5", // Fundo cinza claro
+    borderRadius: 25, // Cantos arredondados
+    fontSize: 16, // Tamanho da fonte
+    alignSelf: "center", // Centraliza o container horizontalmente
   },
+  // Estilização do campo de entrada da senha
   passwordInput: {
-    flex: 1,
-    height: 50,
-    backgroundColor: "#F5F5F5",
-    borderRadius: 25,
-    fontSize: 16,
-    alignSelf: "center",
+    flex: 1, // Ocupa todo o espaço disponível dentro do container
+    height: 50, // Altura do campo de senha
+    backgroundColor: "#F5F5F5", // Fundo cinza claro
+    borderRadius: 25, // Cantos arredondados
+    fontSize: 16, // Tamanho da fonte
+    alignSelf: "center", // Centraliza o campo horizontalmente
   },
+  // Estilização do botão
   button: {
-    backgroundColor: "#F92F2B",
-    paddingVertical: 15,
-    paddingHorizontal: 20,
-    borderRadius: 25,
-    width: "89%",
-    alignItems: "center",
-    marginBottom: 40,
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    elevation: 6,
+    backgroundColor: "#F92F2B", // Fundo vermelho para o botão
+    paddingVertical: 15, // Padding vertical de 15 unidades
+    paddingHorizontal: 20, // Padding horizontal de 20 unidades
+    borderRadius: 25, // Cantos arredondados
+    width: "89%", // O botão ocupa 89% da largura do container
+    alignItems: "center", // Centraliza o conteúdo dentro do botão
+    marginBottom: 40, // Espaço abaixo do botão
+    shadowColor: "#000", // Sombra suave para efeito de profundidade
+    elevation: 6,  // Aplica uma sombra suave ao botão, fazendo-o parecer ligeiramente elevado
   },
+  // Estilização do texto dentro do botão
   buttonText: {
-    fontWeight: "bold",
-    color: "#faf7f7",
-    fontSize: 16,
+    fontWeight: "bold", // Texto em negrito
+    color: "#faf7f7", // Cor branca para o texto
+    fontSize: 16, // Tamanho da fonte
   },
+  // Estilização do texto de link
   linkText: {
-    marginTop: -20,
-    color: "#8a8383",
-    fontWeight: "bold",
+    marginTop: -20, // Move o link para cima com margem negativa
+    color: "#8a8383", // Cor cinza escuro para o texto
+    fontWeight: "bold", // Texto em negrito
   },
+  // Estilização do fundo da tela
   background: {
-    flex: 1,
-    resizeMode: "cover",
-    justifyContent: "center",
+    flex: 1, // O fundo ocupa toda a tela
+    resizeMode: "cover", // A imagem de fundo cobre toda a tela sem distorcer
+    justifyContent: "center", // Centraliza o conteúdo sobre o fundo
   },
+  // Container do logo
   logoContainer: {
-    marginBottom: 10,
-    alignItems: "center",
+    marginBottom: 10, // Espaço abaixo do logo
+    alignItems: "center", // Centraliza o logo horizontalmente
   },
+  // Estilização do logo
   logo: {
-    width: 330,
-    height: 150,
+    width: 330, // Largura do logo
+    height: 150, // Altura do logo
   },
 });

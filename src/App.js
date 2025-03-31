@@ -1,8 +1,8 @@
 // Importa as bibliotecas necessárias
 import React from "react";
-import Login from "./screens/Login"; // Importa a tela de Login
-import Salas from "./screens/Salas"; // Importa a tela de Salas
-import Cadastro from "./screens/Cadastro"; // Importa a tela de Cadastro
+import Login from "./screens/Login"; 
+import Salas from "./screens/Salas"; 
+import Cadastro from "./screens/Cadastro"; 
 import { NavigationContainer } from "@react-navigation/native"; // Container para gerenciar a navegação
 import { createStackNavigator } from "@react-navigation/stack"; // Cria uma navegação baseada em pilha (Stack Navigation)
 
