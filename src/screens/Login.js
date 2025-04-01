@@ -171,7 +171,7 @@ const styles = StyleSheet.create({
   borderRadius: 25, // Cantos arredondados
   alignSelf: "center", // Centraliza horizontalmente
 },
-
+  // Estilo do campo de entrada de senha
 passwordInput: {
   flex: 1, // Ocupa o máximo de espaço possível
   height: 50, // Altura do campo
