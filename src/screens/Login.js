@@ -160,28 +160,23 @@ const styles = StyleSheet.create({
     alignSelf: "center", // Centraliza o campo horizontalmente
   },
   // Container para o campo de senha
-  passwordContainer: {
-    flexDirection: "row", // Organiza os itens na horizontal
-    alignItems: "center", // Centraliza os itens verticalmente
-    width: "100%", // O container ocupa toda a largura
-    height: 50, // Altura de 50 unidades
-    paddingRight: 10, // Padding à direita
-    marginBottom: 20, // Espaço abaixo do container
-    paddingHorizontal: 15, // Espaçamento nas laterais
-    backgroundColor: "#F5F5F5", // Fundo cinza claro
-    borderRadius: 25, // Cantos arredondados
-    fontSize: 16, // Tamanho da fonte
-    alignSelf: "center", // Centraliza o container horizontalmente
-  },
-  // Estilização do campo de entrada da senha
-  passwordInput: {
-    flex: 1, // Ocupa todo o espaço disponível dentro do container
-    height: 50, // Altura do campo de senha
-    backgroundColor: "#F5F5F5", // Fundo cinza claro
-    borderRadius: 25, // Cantos arredondados
-    fontSize: 16, // Tamanho da fonte
-    alignSelf: "center", // Centraliza o campo horizontalmente
-  },
+ passwordContainer: {
+  flexDirection: "row", // Organiza os itens na horizontal
+  alignItems: "center", // Alinha verticalmente no centro
+  width: "100%", // O container ocupa toda a largura
+  paddingRight: 18, // Espaçamento à direita (para ícone)
+  marginBottom: 20, // Espaço abaixo do container
+  paddingHorizontal: 15, // Espaçamento interno lateral
+  backgroundColor: "#F5F5F5", // Fundo cinza claro
+  borderRadius: 25, // Cantos arredondados
+  alignSelf: "center", // Centraliza horizontalmente
+},
+
+passwordInput: {
+  flex: 1, // Ocupa o máximo de espaço possível
+  height: 50, // Altura do campo
+  fontSize: 16, // Tamanho do texto
+},
   // Estilização do botão
   button: {
     backgroundColor: "#F92F2B", // Fundo vermelho para o botão
