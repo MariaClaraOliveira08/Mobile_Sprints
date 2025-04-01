@@ -19,7 +19,7 @@ export default function Login() {
 
   // Estado para armazenar os dados do usuário no login
   const [user, setUser] = useState({
-    email: "",     
+    cpf: "",     
     password: "",  
     showPassword: false,  
   });
