@@ -179,27 +179,22 @@ const styles = StyleSheet.create({
 
   // Container para o campo de senha (com ícone ou ação ao lado)
   passwordContainer: {
-    flexDirection: "row", // Organiza os itens dentro do container na horizontal
-    alignItems: "center", // Alinha os itens verticalmente no centro
-    width: "100%", // O container ocupa toda a largura
-    paddingRight: 18, // Adiciona um padding à direita
-    marginBottom: 20, // Adiciona um espaço abaixo do container
-    paddingHorizontal: 15, // Cria um espaçamento interno nas laterais
-    backgroundColor: "#F5F5F5", // Fundo cinza claro
-    borderRadius: 25, // Arredonda os cantos do container
-    fontSize: 16, // Define o tamanho da fonte para o texto inserido
-    alignSelf: "center", // Centraliza o container horizontalmente
-  },
-
-  // Estilo do campo de entrada de senha
-  passwordInput: {
-    flex: 1, // O campo ocupa todo o espaço disponível dentro do container
-    height: 50, // Altura do campo de senha
-    backgroundColor: "#F5F5F5", // Fundo cinza claro
-    borderRadius: 25, // Arredonda os cantos
-    fontSize: 16, // Tamanho da fonte para o texto inserido
-    alignSelf: "center", // Centraliza o campo horizontalmente
-  },
+  flexDirection: "row", // Organiza os itens na horizontal
+  alignItems: "center", // Alinha verticalmente no centro
+  width: "100%", // O container ocupa toda a largura
+  paddingRight: 18, // Espaçamento à direita (para ícone)
+  marginBottom: 20, // Espaço abaixo do container
+  paddingHorizontal: 15, // Espaçamento interno lateral
+  backgroundColor: "#F5F5F5", // Fundo cinza claro
+  borderRadius: 25, // Cantos arredondados
+  alignSelf: "center", // Centraliza horizontalmente
+},
+// Estilo do campo de entrada de senha
+passwordInput: {
+  flex: 1, // Ocupa o máximo de espaço possível
+  height: 50, // Altura do campo
+  fontSize: 16, // Tamanho do texto
+},
 
   // Estilo para o botão de ação (login, submit, etc.)
   button: {
