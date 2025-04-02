@@ -27,7 +27,7 @@ export default function Cadastro({ navigation }) {
     cpf: "",       
     email: "",     
     password: "",
-    showPassword: false,  
+    showPassword: true,  
   });
 
   // Função responsável por enviar os dados do cadastro para a API
