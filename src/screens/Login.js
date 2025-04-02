@@ -21,7 +21,7 @@ export default function Login() {
   const [user, setUser] = useState({
     cpf: "",     
     password: "",  
-    showPassword: false,  
+    showPassword: true,  
   });
 
   // Função para lidar com o login do usuário
