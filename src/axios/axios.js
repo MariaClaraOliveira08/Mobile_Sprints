@@ -4,7 +4,7 @@ import axios from "axios";
 // Cria uma instância do axios com uma configuração padrão
 const api = axios.create({
     // Define a URL base para as requisições da API
-    baseURL: "http://10.89.240.80:5000/api/reservas/v1",
+    baseURL: "http://10.89.240.81:5000/api/reservas/v1",
     
     // Define os headers padrão para todas as requisições
     headers:{

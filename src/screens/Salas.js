@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, Alert, ScrollView } from "react-native";
 import api from "../axios/axios"; // Certifique-se de que o caminho está correto
+import Layout from "../Components/Layout";
 
 function ListSalas() {
   const [salas, setSalas] = useState([]);
@@ -20,6 +21,7 @@ function ListSalas() {
   }, []);
 
   return (
+    <Layout>
     <View style={styles.container}>
       <Text style={styles.title}>Salas de Aula</Text>
       <View style={styles.tableHeader}>
@@ -32,7 +34,7 @@ function ListSalas() {
           // Adicionando a alternância de cor de fundo para as linhas
           const backgroundColor = index % 2 === 0 ? "#FFD9D9" : "#FFFFFF"; // Rosa claro para linhas pares
           return (
-            <View key={sala.id_sala} style={[styles.row, { backgroundColor }]}>
+            <View key={sala.number} style={[styles.row, { backgroundColor }]}>
               <Text style={styles.cell}>{sala.number}</Text>
               <Text style={styles.cell}>{sala.description}</Text>
               <Text style={styles.cell}>{sala.capacity}</Text>
@@ -41,6 +43,7 @@ function ListSalas() {
         })}
       </ScrollView>
     </View>
+    </Layout>
   );
 }
 
@@ -48,12 +51,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: "#FFCCCB",
   },
   title: {
     textAlign: "center",
     marginBottom: 16,
-    color: "#B22222",
+    color: "#FF3F3F",
     fontFamily: "sans-serif",
     fontWeight: "bold",
     fontSize: 36,

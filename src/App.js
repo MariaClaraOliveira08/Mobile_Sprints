@@ -1,8 +1,12 @@
 // Importa as bibliotecas necessárias
 import React from "react";
-import Login from "./screens/Login"; 
-import Salas from "./screens/Salas"; 
-import Cadastro from "./screens/Cadastro"; 
+import Login from "./screens/Login";
+import Salas from "./screens/Salas";
+import Cadastro from "./screens/Cadastro";
+import Home from "./screens/Home";
+import Reserva from "./screens/Reserva";
+import Disponibilidade from "./screens/Disponibilidade";
+import Layout from "./Components/Layout";
 import { NavigationContainer } from "@react-navigation/native"; // Container para gerenciar a navegação
 import { createStackNavigator } from "@react-navigation/stack"; // Cria uma navegação baseada em pilha (Stack Navigation)
 
@@ -20,6 +24,10 @@ export default function App() {
 
         {/* Tela de Cadastro - Para novos usuários se registrarem */}
         <Stack.Screen name="Cadastro" component={Cadastro} />
+        <Stack.Screen name="Home" component={Home} />
+        <Stack.Screen name="Layout" component={Layout} />
+        <Stack.Screen name="Reserva" component={Reserva} />
+        <Stack.Screen name="Disponibilidade" component={Disponibilidade} />
 
         {/* Tela de Salas - Redirecionado após o login bem-sucedido */}
         <Stack.Screen name="Salas" component={Salas} />

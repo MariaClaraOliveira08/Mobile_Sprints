@@ -14,6 +14,7 @@ import api from "../axios/axios";  // Importa a API para realizar a requisição
 import { useNavigation } from "@react-navigation/native";  // Importa a navegação entre telas
 import { Ionicons } from "@expo/vector-icons";  // Importa o pacote de ícones
 
+
 export default function Login() {
   const navigation = useNavigation(); // Inicializa a navegação
 
@@ -35,7 +36,7 @@ export default function Login() {
         // Exibe uma mensagem de sucesso
         Alert.alert("OK", response.data.message);
         // Redireciona o usuário para a tela "Salas" 
-        navigation.navigate("Salas"); 
+        navigation.navigate("Home"); 
       },
       (error) => {
         // Exibe uma mensagem de erro
