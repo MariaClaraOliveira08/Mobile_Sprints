@@ -4,7 +4,7 @@ import axios from "axios";
 // Cria uma instância do axios com uma configuração padrão
 const api = axios.create({
     // Define a URL base para as requisições da API
-    baseURL: "http://10.89.240.81:5000/api/reservas/v1",
+    baseURL: "http://10.89.240.64:5000/api/reservas/v1",
     
     // Define os headers padrão para todas as requisições
     headers:{
@@ -21,7 +21,9 @@ const sheets = {
     postLogin:(user)=>api.post("/user/login", user),  
     
     // Função para obter as informações sobre as salas
-    getSalas:()=>api.get("/classroom/")  
+    getSalas:()=>api.get("/classroom/") 
+    
+    postSchedule:()=api.post("/schedule")
 }
 
 // Exporta o objeto 'sheets' para que outras partes do código possam usá-lo

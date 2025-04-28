@@ -1,92 +1,68 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, FlatList, StyleSheet } from 'react-native';
-import Layout from '../Components/Layout';
+import React from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  FlatList,
+  StyleSheet,
+} from "react-native";
+import Layout from "../Components/Layout";
+import DispoDetail from "./DispoDetail";
 
-const Disponibilidade = () => {
-  const [filtro, setFiltro] = useState('');
-  const salas = [
-    { number: 'B10', description: 'LAB INFORMÁTICA', capacity: 16 },
-    { number: '101', description: 'Laboratório de Química', capacity: 25 },
-    { number: '102', description: 'Sala de Aula - Física', capacity: 30 },
+export default function Disponibilidade({ navigation }) {
+  const sala = [
+    { number: "A1", description: "Laboratório de Química", capacity: 25 },
+    { number: "A2", description: "Sala de Aula - Física", capacity: 30 },
+    { number: "B1", description: "LAB INFORMÁTICA", capacity: 16 },
+    { number: "B2", description: "Sala para reuniões", capacity: 20 },
+    { number: "C1", description: "Sala de filmes", capacity: 30 },
+    { number: "C2", description: "Laboratório de Biologia", capacity: 32 },
+    { number: "D1", description: "Sala de Mecânica", capacity: 30 },
+    { number: "D2", description: "Oficina de Soldagem", capacity: 32 },
   ];
 
-  const salasFiltradas = salas.filter((sala) =>
-    sala.description.toLowerCase().includes(filtro.toLowerCase())
-  );
+  const handleTaskPress = (sala) => {
+    navigation.navigate("DispoDetail", { sala });
+  };
 
   return (
     <Layout>
       <View style={styles.container}>
-        <Text style={styles.titulo}>Disponibilidade</Text>
-
-        <View style={styles.cabecalho}>
-          <Text style={styles.colunaCabecalho}>Número</Text>
-          <Text style={styles.colunaCabecalho}>Descrição</Text>
-          <Text style={styles.colunaCabecalho}>Capacidade</Text>
-        </View>
-
-
+        <Text style={styles.title}>Salas Disponíveis:</Text>
         <FlatList
-          data={salasFiltradas}
-          keyExtractor={(item) => item.number}
+          data={sala}
+          keyExtractor={(item) => item.number.toString()}
           renderItem={({ item }) => (
-            <View style={styles.card}>
-              <Text style={styles.cardText}>{item.number}</Text>
-              <Text style={styles.cardText}>{item.description}</Text>
-              <Text style={styles.cardText}>{item.capacity}</Text>
-            </View>
+            <TouchableOpacity
+              style={styles.itemCard}
+              onPress={() => handleTaskPress(item)}
+            >
+              <Text>{item.number}</Text>
+            </TouchableOpacity>
           )}
         />
       </View>
     </Layout>
   );
-};
-
+}
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
+  container:{
+alignItems:"center"
   },
-  titulo: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#F44336',
-    textAlign: 'center',
-    marginBottom: 20,
-  },
-  cabecalho: {
-    flexDirection: 'row',
-    backgroundColor: '#FF6F6F',
-    paddingVertical: 10,
-    borderRadius: 10,
-    justifyContent: 'space-around',
+  itemCard: {
+    padding: 15,
+    width:200,
+    backgroundColor: "#FF8787",
     marginBottom: 10,
+    borderRadius: 8,
+    alignItems: "center",
   },
-  colunaCabecalho: {
-    color: 'white',
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
-  input: {
-    backgroundColor: '#D9D9D9',
-    borderRadius: 10,
-    padding: 10,
-    marginBottom: 15,
-    color: '#000',
-  },
-  card: {
-    backgroundColor: '#FFB3B3',
-    borderRadius: 10,
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    paddingVertical: 15,
-    marginBottom: 10,
-  },
-  cardText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#000',
-  },
+  title: {
+    textAlign: "center",
+    marginBottom: 16,
+    color: "#FF3F3F",
+    fontFamily: "sans-serif",
+    fontWeight: "bold",
+    fontSize: 36,
+  }
 });
-
-export default Disponibilidade;
