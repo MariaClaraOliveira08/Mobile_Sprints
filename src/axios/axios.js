@@ -21,9 +21,8 @@ const sheets = {
     postLogin:(user)=>api.post("/user/login", user),  
     
     // Função para obter as informações sobre as salas
-    getSalas:()=>api.get("/classroom/") 
-    
-    postSchedule:()=api.post("/schedule")
+    getSalas:()=>api.get("/classroom/"),
+    getSalasSemReservas: () => api.get('/disponibilidade/'),
 }
 
 // Exporta o objeto 'sheets' para que outras partes do código possam usá-lo
