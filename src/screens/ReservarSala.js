@@ -48,7 +48,7 @@ export default function CriarReserva({ navigation }) {
       navigation.goBack();
     } catch (error) {
       // Loga e exibe erro caso falhe
-      console.error("Erro ao reservar sala:", error);
+      console.log("Erro ao reservar sala:", error);
       Alert.alert("Erro", "Não foi possível realizar a reserva.");
     } finally {
       setLoading(false); // Desativa o carregamento
@@ -73,7 +73,7 @@ export default function CriarReserva({ navigation }) {
         <View style={styles.card}>
           {" "}
           {/* Card com os campos devidos */}
-          <Text style={styles.label}>Descrição:</Text>{" "}
+          <Text style={styles.label}>Descrição:</Text>
           {/* O que vai estar encima do input */}
           <TextInput
             style={styles.input}
