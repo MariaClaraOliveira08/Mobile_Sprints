@@ -1,168 +1,165 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
+  FlatList,
   StyleSheet,
-  Alert,
-  ScrollView,
-  TouchableOpacity,
+  ActivityIndicator,
   Modal,
+  TouchableOpacity,
   TextInput,
+  Button,
+  StatusBar,
+  ScrollView,
 } from "react-native";
-import api from "../axios/axios"; // Verifique se esse caminho está certo
+import api from "../axios/axios";
 import Layout from "../Components/Layout";
-import { StatusBar } from "react-native";
 
-
-function ListSalas() {
+export default function SalasDisponiveis({ navigation }) {
   const [salas, setSalas] = useState([]);
+  const [loading, setLoading] = useState(true);
+
   const [modalVisible, setModalVisible] = useState(false);
   const [salaSelecionada, setSalaSelecionada] = useState(null);
-  const [descricao, setDescricao] = useState("");
-  const [inicio, setInicio] = useState("");
-  const [fim, setFim] = useState("");
+  const [dataDigitada, setDataDigitada] = useState("");
+  const [horarios, setHorarios] = useState([]);
 
-  async function getSalas() {
+  useEffect(() => {
+    buscarSalas();
+  }, []);
+
+  async function buscarSalas() {
     try {
       const response = await api.getSalas();
-      setSalas(response.data.classrooms);
+      if (response && response.data && response.data.classrooms) {
+        setSalas(response.data.classrooms);
+      } else {
+        console.log("Dados de salas não encontrados");
+      }
     } catch (error) {
-      Alert.alert("Erro", "Erro ao buscar salas");
+      console.log("Erro ao buscar salas:", error);
+    } finally {
+      setLoading(false);
     }
   }
 
-  useEffect(() => {
-    getSalas();
-  }, []);
-
-  const abrirModalReserva = (sala) => {
-    setSalaSelecionada(sala);
-    setModalVisible(true);
-  };
-
-  const reservarSala = async () => {
-    if (!salaSelecionada || !descricao || !inicio || !fim) {
-      alert("Por favor, preencha todos os campos.");
-      return;
-    }
-
+  async function buscarHorariosDisponiveis() {
+    if (!dataDigitada || !salaSelecionada) return;
     try {
-      const response = await fetch('http://10.89.240.64:5000/api/reservas/v1/schedule', {
-
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            fk_id_usuario: 1, // Substitua pelo ID do usuário logado
-            descricao: descricao,
-            inicio_periodo: inicio,
-            fim_periodo: fim,
-            fk_number: salaSelecionada.number,
-          }),
-        }
+      const response = await api.getHorariosDisponiveisPorSalaEData(
+        salaSelecionada.number,
+        dataDigitada
       );
-
-      const data = await response.json();
-
-      if (response.ok) {
-        alert("Reserva feita com sucesso!");
-        setDescricao("");
-        setInicio("");
-        setFim("");
-        setModalVisible(false);
+      if (response && response.data && response.data.time_slots) {
+        setHorarios(response.data.time_slots);
       } else {
-        console.error("Erro da API:", data);
-        alert("Erro ao fazer a reserva: " + (data.error || "Tente novamente."));
+        console.log("Nenhum horário disponível encontrado");
       }
     } catch (error) {
-      console.error("Erro na requisição:", error);
-      alert("Não foi possível conectar ao servidor.");
+      console.log("Erro ao buscar horários:", error);
     }
-  };
+  }
+
+  function renderHorarios() {
+    if (horarios.length === 0) {
+      return <Text style={styles.noHorarios}>Nenhum horário disponível</Text>;
+    }
+
+    return horarios.map(
+      (
+        horario,
+        index 
+      ) => (
+        <TouchableOpacity
+          key={index}
+          style={styles.horarioItem}
+          onPress={() => {
+            navigation.navigate("Reservar Sala", {
+              sala: salaSelecionada.number,
+              data: dataDigitada,
+              horaInicio: horario.start_time,
+              horaFim: horario.end_time,
+            });
+          }}
+        >
+          <Text style={styles.horarioText}>
+            {horario.start_time} - {horario.end_time}
+          </Text>
+        </TouchableOpacity>
+      )
+    );
+  }
 
   return (
     <Layout>
       <StatusBar hidden={false} />
       <View style={styles.container}>
-        <Text style={styles.title}>Salas de Aula</Text>
+        <Text style={styles.title}>Salas</Text>
 
-        <View style={styles.tableHeader}>
-          <Text style={styles.headerCell}>Número</Text>
-          <Text style={styles.headerCell}>Descrição</Text>
-          <Text style={styles.headerCell}>Capacidade</Text>
+        <View style={styles.headerRow}>
+          <Text style={styles.headerText}>Número</Text>
+          <Text style={styles.headerText}>Descrição</Text>
+          <Text style={styles.headerText}>Capacidade</Text>
         </View>
 
-        <ScrollView>
-          {salas.map((sala, index) => {
-            const backgroundColor = index % 2 === 0 ? "#FFD9D9" : "#FFFFFF";
-            return (
+        {loading ? (
+          <ActivityIndicator size="large" color="#F2B7FD" />
+        ) : (
+          <FlatList
+            data={salas}
+            keyExtractor={(item) => item.number.toString()}
+            renderItem={({ item }) => (
               <TouchableOpacity
-                key={sala.number}
-                onPress={() => abrirModalReserva(sala)}
+                onPress={() => {
+                  setSalaSelecionada(item);
+                  setModalVisible(true);
+                  setHorarios([]);
+                  setDataDigitada("");
+                }}
               >
-                <View style={[styles.row, { backgroundColor }]}>
-                  <Text style={styles.cell}>{sala.number}</Text>
-                  <Text style={styles.cell}>{sala.description}</Text>
-                  <Text style={styles.cell}>{sala.capacity}</Text>
+                <View style={styles.row}>
+                  <Text style={styles.cell}>{item.number}</Text>
+                  <Text style={styles.cell}>{item.description}</Text>
+                  <Text style={styles.cell}>{item.capacity}</Text>
                 </View>
               </TouchableOpacity>
-            );
-          })}
-        </ScrollView>
+            )}
+          />
+        )}
 
-        {/* Modal para Reservar Sala */}
         <Modal
           visible={modalVisible}
+          transparent={true}
           animationType="slide"
           onRequestClose={() => setModalVisible(false)}
         >
-          <Layout>
-            <ScrollView contentContainerStyle={styles.modalContent}>
-              <Text style={styles.title}>
-                Reservar Sala {salaSelecionada?.number}
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContainer}>
+              <Text style={styles.modalTitle}>
+                Sala {salaSelecionada?.number}
               </Text>
 
-              <View style={styles.card}>
-                <Text style={styles.label}>Descrição</Text>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Ex: Reunião de projeto"
-                  value={descricao}
-                  onChangeText={setDescricao}
-                />
+              <Text>Digite a data (YYYY-MM-DD):</Text>
+              <TextInput
+                style={styles.input}
+                value={dataDigitada}
+                onChangeText={setDataDigitada}
+                placeholder="Ex: 2025-05-06"
+              />
 
-                <Text style={styles.label}>Início (AAAA-MM-DD HH:MM:SS)</Text>
-                <TextInput
-                  style={styles.input}
-                  placeholder="2025-04-28 14:00:00"
-                  value={inicio}
-                  onChangeText={setInicio}
-                />
+              <Button
+                title="Ver horários disponíveis"
+                color="#fa8075"
+                onPress={buscarHorariosDisponiveis}
+              />
+              <ScrollView>
+                <Text style={styles.horariosTitle}>Horários disponíveis:</Text>
+                {renderHorarios()}
+              </ScrollView>
 
-                <Text style={styles.label}>Fim (AAAA-MM-DD HH:MM:SS)</Text>
-                <TextInput
-                  style={styles.input}
-                  placeholder="2025-04-28 16:00:00"
-                  value={fim}
-                  onChangeText={setFim}
-                />
-
-                <TouchableOpacity
-                  style={styles.buttonReservar}
-                  onPress={reservarSala}
-                >
-                  <Text style={styles.buttonText}>Reservar</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.buttonFechar}
-                  onPress={() => setModalVisible(false)}
-                >
-                  <Text style={styles.buttonText}>Cancelar</Text>
-                </TouchableOpacity>
-              </View>
-            </ScrollView>
-          </Layout>
+              <Button title="Fechar" color="#fa8075" onPress={() => setModalVisible(false)} />
+            </View>
+          </View>
         </Modal>
       </View>
     </Layout>
@@ -175,91 +172,83 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   title: {
-    textAlign: "center",
-    marginBottom: 16,
-    color: "#FF3F3F",
+    fontSize: 26,
     fontWeight: "bold",
-    fontSize: 30,
+    textAlign: "center",
+    color: "#d93030",
+    marginBottom: 20,
   },
-  tableHeader: {
+  headerRow: {
     flexDirection: "row",
-    backgroundColor: "#ff6347",
+    justifyContent: "space-between",
+    backgroundColor: "#ff5e3a",
     padding: 10,
-    borderRadius: 5,
+    borderRadius: 8,
     marginBottom: 10,
   },
-  headerCell: {
+  headerText: {
     flex: 1,
-    textAlign: "center",
     fontWeight: "bold",
-    fontSize: 18,
+    color: "white",
+    textAlign: "center",
   },
   row: {
     flexDirection: "row",
-    padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
+    backgroundColor: "#f8c7c7",
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 8,
   },
   cell: {
     flex: 1,
     textAlign: "center",
-    fontWeight: "bold",
-    fontSize: 16,
+    fontWeight: "500",
   },
-  modalContent: {
-    padding: 20,
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.5)",
     justifyContent: "center",
     alignItems: "center",
-    alignContent: "center",
-    position: "absolute",   // Adiciona posição absoluta
-    top: 0,                 // Alinha ao topo da tela
-    left: 0,                // Alinha à esquerda da tela
-    right: 0,               // Alinha à direita da tela
-    bottom: 0,              // Alinha ao fundo da tela
   },
-  
-  fecharText: {
-    color: "#007bff",
-    fontSize: 16,
+  modalContainer: {
+    backgroundColor: "white",
+    padding: 20,
+    borderRadius: 10,
+    width: "85%",
+    alignItems: "center",
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
     marginBottom: 10,
   },
-  card: {
-    backgroundColor: "#FFC2C2",
-    padding: 20,
-    borderRadius: 16,
+  input: {
     width: "100%",
-    maxWidth: 400,
-    alignItems: "stretch",
+    padding: 10,
+    borderWidth: 1,
+    borderColor: "#fa8072",
+    borderRadius: 6,
+    marginTop: 8,
+    marginBottom: 10,
   },
-  label: {
+  horariosTitle: {
     fontWeight: "bold",
+    marginTop: 10,
     marginBottom: 5,
   },
-  input: {
-    backgroundColor: "#E4E4E4",
-    borderRadius: 10,
+  horarioItem: {
     padding: 10,
-    marginBottom: 15,
+    backgroundColor: "#Fa8174",
+    borderRadius: 5,
+    marginVertical: 5,
   },
-  buttonReservar: {
-    backgroundColor: "#F44336",
-    padding: 15,
-    borderRadius: 30,
-    marginTop: 10,
-  },
-  buttonFechar: {
-    backgroundColor: "#B0B0B0",
-    padding: 15,
-    borderRadius: 30,
-    marginTop: 10,
-  },
-
-  buttonText: {
-    color: "white",
-    fontWeight: "bold",
+  horarioText: {
+    fontSize: 15,
+    color: "#fff",
     textAlign: "center",
-    fontSize: 16,
+  },
+  noHorarios: {
+    color: "gray",
+    fontStyle: "italic",
   },
 });
-
-export default ListSalas;

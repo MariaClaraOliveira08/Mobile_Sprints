@@ -17,12 +17,6 @@ function Home({ navigation }) {
             <Text style={styles.buttonText}>Salas</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => navigation.navigate("SalasDisponiveis")}
-          >
-            <Text style={styles.buttonText}>Disponibilidade</Text>
-          </TouchableOpacity>
         </View>
 
 
