@@ -10,37 +10,42 @@ import {
   Image,
   ImageBackground,
 } from "react-native";
-import api from "../axios/axios";  // Importa a API para realizar a requisição de login
-import { useNavigation } from "@react-navigation/native";  // Importa a navegação entre telas
-import { Ionicons } from "@expo/vector-icons";  // Importa o pacote de ícones
-
+import api from "../axios/axios"; // Importa a API para realizar a requisição de login
+import { useNavigation } from "@react-navigation/native"; // Importa a navegação entre telas
+import { Ionicons } from "@expo/vector-icons"; // Importa o pacote de ícones
+import * as SecureStore from "expo-secure-store";
 
 export default function Login() {
-  const navigation = useNavigation(); // Inicializa a navegação
+  const navigation = useNavigation(); 
 
   // Estado para armazenar os dados do usuário no login
   const [user, setUser] = useState({
-    cpf: "",     
-    password: "",  
-    showPassword: true,  
+    cpf: "",
+    password: "",
+    showPassword: true,
   });
+
+  async function saveToken(token) {
+    await SecureStore.setItemAsync("token", token);
+  }
 
   // Função para lidar com o login do usuário
   async function handleLogin() {
     // Exibe no console os dados preenchidos no login
-    console.log(user); 
+    console.log(user);
 
     // Faz a requisição para a API enviando os dados do usuário
     await api.postLogin(user).then(
       (response) => {
         // Exibe uma mensagem de sucesso
         Alert.alert("OK", response.data.message);
-        // Redireciona o usuário para a tela "Salas" 
-        navigation.navigate("Home"); 
+        // Redireciona o usuário para a tela "Salas"
+        saveToken(response.data.token);
+        navigation.navigate("Home");
       },
       (error) => {
         // Exibe uma mensagem de erro
-        Alert.alert("Erro", error.response.data.error); 
+        Alert.alert("Erro", error.response.data.error);
       }
     );
   }
@@ -58,7 +63,7 @@ export default function Login() {
             source={require("../../assets/logo-senai-1.png")}
             style={styles.logo}
             // Ajusta a imagem sem distorcer
-            resizeMode="contain" 
+            resizeMode="contain"
           />
         </View>
 
@@ -82,7 +87,7 @@ export default function Login() {
               placeholder="Senha"
               value={user.password}
               // Controla a visibilidade da senha
-              secureTextEntry={user.showPassword} 
+              secureTextEntry={user.showPassword}
               onChangeText={(value) => {
                 setUser({ ...user, password: value });
               }}
@@ -90,15 +95,15 @@ export default function Login() {
 
             {/* Botão para alternar a visibilidade da senha */}
             <TouchableOpacity
-              onPress={() =>  
+              onPress={() =>
                 // Mantém as outras propriedades de 'user' intactas. (...user)
                 // Altera o valor de 'showPassword' (inverte de true para false ou vice-versa).
                 setUser({ ...user, showPassword: !user.showPassword })
               }
             >
               <Ionicons
-              // "eye-off" para ocultar a senha, "eye" para mostrar.
-                name={user.showPassword ? "eye-off" : "eye"} 
+                // "eye-off" para ocultar a senha, "eye" para mostrar.
+                name={user.showPassword ? "eye-off" : "eye"}
                 size={24}
                 color="gray"
               />
@@ -161,23 +166,23 @@ const styles = StyleSheet.create({
     alignSelf: "center", // Centraliza o campo horizontalmente
   },
   // Container para o campo de senha
- passwordContainer: {
-  flexDirection: "row", // Organiza os itens na horizontal
-  alignItems: "center", // Alinha verticalmente no centro
-  width: "100%", // O container ocupa toda a largura
-  paddingRight: 18, // Espaçamento à direita (para ícone)
-  marginBottom: 20, // Espaço abaixo do container
-  paddingHorizontal: 15, // Espaçamento interno lateral
-  backgroundColor: "#F5F5F5", // Fundo cinza claro
-  borderRadius: 25, // Cantos arredondados
-  alignSelf: "center", // Centraliza horizontalmente
-},
+  passwordContainer: {
+    flexDirection: "row", // Organiza os itens na horizontal
+    alignItems: "center", // Alinha verticalmente no centro
+    width: "100%", // O container ocupa toda a largura
+    paddingRight: 18, // Espaçamento à direita (para ícone)
+    marginBottom: 20, // Espaço abaixo do container
+    paddingHorizontal: 15, // Espaçamento interno lateral
+    backgroundColor: "#F5F5F5", // Fundo cinza claro
+    borderRadius: 25, // Cantos arredondados
+    alignSelf: "center", // Centraliza horizontalmente
+  },
   // Estilo do campo de entrada de senha
-passwordInput: {
-  flex: 1, // Ocupa o máximo de espaço possível
-  height: 50, // Altura do campo
-  fontSize: 16, // Tamanho do texto
-},
+  passwordInput: {
+    flex: 1, // Ocupa o máximo de espaço possível
+    height: 50, // Altura do campo
+    fontSize: 16, // Tamanho do texto
+  },
   // Estilização do botão
   button: {
     backgroundColor: "#F92F2B", // Fundo vermelho para o botão
@@ -188,7 +193,7 @@ passwordInput: {
     alignItems: "center", // Centraliza o conteúdo dentro do botão
     marginBottom: 40, // Espaço abaixo do botão
     shadowColor: "#000", // Sombra suave para efeito de profundidade
-    elevation: 6,  // Aplica uma sombra suave ao botão, fazendo-o parecer ligeiramente elevado
+    elevation: 6, // Aplica uma sombra suave ao botão, fazendo-o parecer ligeiramente elevado
   },
   // Estilização do texto dentro do botão
   buttonText: {

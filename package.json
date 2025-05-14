@@ -9,6 +9,7 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@react-native-community/datetimepicker": "8.2.0",
     "@react-navigation/native": "^7.0.15",
     "@react-navigation/stack": "^7.1.2",
     "axios": "^1.9.0",
@@ -17,10 +18,12 @@
     "react": "18.3.1",
     "react-native": "0.76.7",
     "react-native-gesture-handler": "^2.24.0",
+    "react-native-modal-datetime-picker": "^18.0.0",
     "react-native-reanimated": "^3.17.1",
     "react-native-safe-area-context": "^5.3.0",
     "react-native-screens": "^4.9.2",
-    "react-native-vector-icons": "^10.2.0"
+    "react-native-vector-icons": "^10.2.0",
+    "expo-secure-store": "~14.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"

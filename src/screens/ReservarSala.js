@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import sheets from "../axios/axios";
 import Layout from "../Components/Layout";
+import DateTimePicker from "../Components/DateTimePicker";
 
 export default function CriarReserva({ navigation }) {
   // Estados para armazenar os dados do formulário
@@ -81,12 +82,16 @@ export default function CriarReserva({ navigation }) {
             onChangeText={setDescricao}
             placeholder="Digite a descrição"
           />
-          <Text style={styles.label}>Data (AAAA-MM-DD):</Text>
-          <TextInput
-            style={styles.input}
-            value={data}
-            onChangeText={setData}
-            placeholder="Exemplo: 2025-05-06"
+          <Text style={styles.label}>Data:</Text>
+          <DateTimePicker
+            type={"date"}
+            buttonTitle={
+              sala.data === ""
+                ? "Selecione a data da reserva"
+                : sala.data.toLocaleString()
+            }
+            setValue={setData}
+            dateKey={"data"}
           />
           {/* Campos para horário de início e término */}
           <View style={styles.row}>

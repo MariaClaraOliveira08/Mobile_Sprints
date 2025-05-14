@@ -125,6 +125,8 @@ export default function SalasDisponiveis({ navigation }) {
                   <Text style={styles.cell}>{item.number}</Text>
                   <Text style={styles.cell}>{item.description}</Text>
                   <Text style={styles.cell}>{item.capacity}</Text>
+
+                  <Text>{new Date(item.data).toLocaleString}</Text>
                 </View>
               </TouchableOpacity>
             )}
@@ -161,11 +163,16 @@ export default function SalasDisponiveis({ navigation }) {
               />
               <ScrollView>
                 <Text style={styles.horariosTitle}>Horários disponíveis:</Text>
-                {renderHorarios()} {/* Exibe os horários disponíveis ou a mensagem de nenhum horário */}
+                {renderHorarios()}{" "}
+                {/* Exibe os horários disponíveis ou a mensagem de nenhum horário */}
               </ScrollView>
 
               {/* Botão para fechar o modal */}
-              <Button title="Fechar" color="#fa8075" onPress={() => setModalVisible(false)} />
+              <Button
+                title="Fechar"
+                color="#fa8075"
+                onPress={() => setModalVisible(false)}
+              />
             </View>
           </View>
         </Modal>
