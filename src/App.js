@@ -5,6 +5,7 @@ import Cadastro from "./screens/Cadastro";
 import ReservarSala from "./screens/ReservarSala";
 import Home from "./screens/Home";
 import Layout from "./Components/Layout";
+import PerfilUsuario from "./screens/Perfil";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 
@@ -20,6 +21,7 @@ export default function App() {
         <Stack.Screen name="Layout" component={Layout} />
         <Stack.Screen name="Salas" component={Salas} />
         <Stack.Screen name="Reservar Sala" component={ReservarSala} />
+        <Stack.Screen name="PerfilUsuario" component={PerfilUsuario}/>
       </Stack.Navigator>
     </NavigationContainer>
   );

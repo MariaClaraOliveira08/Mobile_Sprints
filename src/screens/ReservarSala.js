@@ -1,4 +1,3 @@
-// Importações necessárias do React e React Native
 import React, { useState } from "react";
 import {
   View,
@@ -14,108 +13,126 @@ import Layout from "../Components/Layout";
 import DateTimePicker from "../Components/DateTimePicker";
 
 export default function CriarReserva({ navigation }) {
-  // Estados para armazenar os dados do formulário
   const [descricao, setDescricao] = useState("");
-  const [data, setData] = useState("");
-  const [horaInicio, setHoraInicio] = useState("");
-  const [horaFim, setHoraFim] = useState("");
+  const [data, setData] = useState(null);
+  const [horaInicio, setHoraInicio] = useState(null);
+  const [horaFim, setHoraFim] = useState(null);
   const [sala, setSala] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Função que será chamada ao clicar no botão de "Reservar"
   const handleReserva = async () => {
-    // Verifica se todos os campos estão preenchidos
     if (!descricao || !data || !horaInicio || !horaFim || !sala) {
       Alert.alert("Erro", "Por favor, preencha todos os campos!");
       return;
     }
 
-    // Monta o objeto com os dados da reserva
+    const dataFormatada = data.toISOString().split("T")[0];
+
+    const horaInicioStr = horaInicio
+      .toTimeString()
+      .split(":")
+      .slice(0, 2)
+      .join(":");
+
+    const horaFimStr = horaFim.toTimeString().split(":").slice(0, 2).join(":");
+
+    const inicio_periodo = new Date(`${dataFormatada}T${horaInicioStr}:00`);
+    const fim_periodo = new Date(`${dataFormatada}T${horaFimStr}:00`);
+
+    if (isNaN(inicio_periodo.getTime()) || isNaN(fim_periodo.getTime())) {
+      Alert.alert("Erro", "Horário inválido.");
+      return;
+    }
+
     const dadosReserva = {
-      fk_id_usuario: 1, // Substitua pelo ID real do usuário logado
+      fk_id_usuario: 1, // Altere conforme necessário
       descricao,
-      inicio_periodo: `${data} ${horaInicio}`, // Formata o início
-      fim_periodo: `${data} ${horaFim}`, // Formata o fim
+      inicio_periodo: inicio_periodo.toISOString(),
+      fim_periodo: fim_periodo.toISOString(),
       fk_number: sala,
     };
 
-    // Tenta enviar os dados para a API
     try {
-      setLoading(true); // Ativa o estado de carregamento
-      const response = await sheets.postReserva(dadosReserva); // Chamada à API
-
-      // Alerta de sucesso e volta para a tela anterior
+      setLoading(true);
+      const response = await sheets.postReserva(dadosReserva);
       Alert.alert("Sucesso", response.data.message);
       navigation.goBack();
     } catch (error) {
-      // Loga e exibe erro caso falhe
       console.log("Erro ao reservar sala:", error);
       Alert.alert("Erro", "Não foi possível realizar a reserva.");
     } finally {
-      setLoading(false); // Desativa o carregamento
+      setLoading(false);
     }
   };
 
-  // Função para limpar os campos do formulário
   const handleCancelar = () => {
     setDescricao("");
-    setData("");
-    setHoraInicio("");
-    setHoraFim("");
+    setData(null);
+    setHoraInicio(null);
+    setHoraFim(null);
     setSala("");
   };
 
-  // JSX da interface do usuário
   return (
     <Layout>
       <View style={styles.container}>
-        <StatusBar hidden={false} /> {/* Exibe a barra de status */}
+        <StatusBar hidden={false} />
         <Text style={styles.title}>Reserva</Text>
         <View style={styles.card}>
-          {" "}
-          {/* Card com os campos devidos */}
           <Text style={styles.label}>Descrição:</Text>
-          {/* O que vai estar encima do input */}
           <TextInput
             style={styles.input}
             value={descricao}
             onChangeText={setDescricao}
             placeholder="Digite a descrição"
           />
+
           <Text style={styles.label}>Data:</Text>
           <DateTimePicker
             type={"date"}
             buttonTitle={
-              sala.data === ""
-                ? "Selecione a data da reserva"
-                : sala.data.toLocaleString()
+              !data ? "Selecione a data da reserva" : data.toLocaleDateString()
             }
             setValue={setData}
-            dateKey={"data"}
           />
-          {/* Campos para horário de início e término */}
-          <View style={styles.row}>
-            <TextInput
-              style={styles.inputSmall}
-              value={horaInicio}
-              onChangeText={setHoraInicio}
-              placeholder="Início: HH:MM"
-            />
-            <TextInput
-              style={styles.inputSmall}
-              value={horaFim}
-              onChangeText={setHoraFim}
-              placeholder="Término: HH:MM"
-            />
-          </View>
+
+          <Text style={styles.label}>Horário de Início:</Text>
+          <DateTimePicker
+            type={"time"}
+            buttonTitle={
+              !horaInicio
+                ? "Selecione o horário de início"
+                : horaInicio.toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })
+            }
+            setValue={setHoraInicio}
+          />
+
+          <Text style={styles.label}>Horário de Término:</Text>
+          <DateTimePicker
+            type={"time"}
+            buttonTitle={
+              !horaFim
+                ? "Selecione o horário de término"
+                : horaFim.toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })
+            }
+            setValue={setHoraFim}
+          />
+
           <Text style={styles.label}>Número da Sala:</Text>
           <TextInput
             style={styles.input}
             value={sala}
             onChangeText={setSala}
             placeholder="Ex: 101"
+            keyboardType="numeric"
           />
-          {/* Botão para confirmar a reserva */}
+
           <TouchableOpacity
             style={styles.reservarBtn}
             onPress={handleReserva}
@@ -125,7 +142,7 @@ export default function CriarReserva({ navigation }) {
               {loading ? "Reservando..." : "RESERVAR"}
             </Text>
           </TouchableOpacity>
-          {/* Botão para cancelar/limpar o formulário */}
+
           <TouchableOpacity style={styles.cancelarBot} onPress={handleCancelar}>
             <Text style={styles.cancelarText}>CANCELAR</Text>
           </TouchableOpacity>
@@ -135,7 +152,6 @@ export default function CriarReserva({ navigation }) {
   );
 }
 
-// Estilos da tela
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -170,22 +186,6 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     borderWidth: 1,
     borderColor: "#ccc",
-  },
-  inputSmall: {
-    flex: 1,
-    backgroundColor: "#ddd",
-    borderRadius: 10,
-    padding: 10,
-    marginHorizontal: 5,
-    marginBottom: 15,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    textAlign: "center",
-  },
-  row: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    width: "100%",
   },
   reservarBtn: {
     backgroundColor: "#e53935",

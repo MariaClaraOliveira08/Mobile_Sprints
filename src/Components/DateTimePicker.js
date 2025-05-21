@@ -14,22 +14,10 @@ const DateTimePickerDefault = ({ type, buttonTitle, dateKey, setValue }) => {
   };
 
   const handleConfirm = (data) => {
-    if (type === "time") {
-      const hour = data.getHours();
-      const minute = data.getMinutes();
-      const formattedTime = `${hour}:${minute}`;
-      setValue((prevState) => ({
-        ...prevState,
-        //chave = date, e o valor é a hora formatada - HH:mm
-        [dateKey]: formattedTime, 
-      }));
-    } else {
-      setValue((prevState) => ({
-        ...prevState,
-        //chave = date, e o valor é aaaa:mm:dd
-        [dateKey]: data, 
-      }));
-    }
+    setValue((prevState) => ({
+      ...prevState,
+      [dateKey]: data, // Salva sempre como objeto Date
+    }));
     hideDatePicker();
   };
 
