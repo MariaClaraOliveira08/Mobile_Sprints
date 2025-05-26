@@ -17,6 +17,13 @@ function Home({ navigation }) {
             <Text style={styles.buttonText}>Salas</Text>
           </TouchableOpacity>
 
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => navigation.navigate("MinhasReservas")}
+          >
+            <Text style={styles.buttonText}>Reservas</Text>
+          </TouchableOpacity>
+
         </View>
 
 

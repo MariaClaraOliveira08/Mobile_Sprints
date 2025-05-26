@@ -23,7 +23,7 @@ const DateTimePickerDefault = ({ type, buttonTitle, dateKey, setValue }) => {
 
   return (
     <View>
-      <Button title={buttonTitle} onPress={showDatePicker} color="violet" />
+      <Button title={buttonTitle} onPress={showDatePicker} color="#e53935" />
       <DateTimePicker
         isVisible={isDatePickerVisable}
         mode={type}

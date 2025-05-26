@@ -45,7 +45,7 @@ export default function CriarReserva({ navigation }) {
     }
 
     const dadosReserva = {
-      fk_id_usuario: 1, // Altere conforme necessário
+      fk_id_usuario: 1, 
       descricao,
       inicio_periodo: inicio_periodo.toISOString(),
       fim_periodo: fim_periodo.toISOString(),

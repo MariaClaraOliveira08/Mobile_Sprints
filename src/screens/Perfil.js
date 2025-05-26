@@ -1,5 +1,4 @@
-// Importações necessárias do React e React Native
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -8,26 +7,52 @@ import {
   StyleSheet,
   Alert,
 } from "react-native";
+import api from "../axios/axios"; 
 
 export default function PerfilUsuario() {
-  // Estados para armazenar os dados do perfil
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  // Função para salvar as alterações
+  useEffect(() => {
+    carregarDadosUsuario();
+  }, []);
+
+  async function carregarDadosUsuario() {
+    try {
+      const response = await api.getUsuario(); // Verifique se essa rota existe no seu backend
+      const usuario = response.data.user;
+
+      setName(usuario.name);
+      setEmail(usuario.email);
+      // Por segurança, normalmente a senha não vem preenchida
+    } catch (error) {
+      Alert.alert("Erro", "Não foi possível carregar os dados do usuário.");
+      console.log(error);
+    }
+  }
+
   async function handleUpdate() {
-    console.log(user);
-    // Chama a função de atualização da API e faz o tratamento da resposta
-    await api.updateUser(user).then(
-      (response) => {
-        Alert.alert("Perfil atualizado com sucesso", response.data.message);
-      },
-      (error) => {
-        // Se houver erro, exibe uma mensagem de erro
-        Alert.alert("Erro", error.response.data.error);
-      }
-    );
+    if (!name || !email) {
+      Alert.alert("Atenção", "Preencha todos os campos obrigatórios.");
+      return;
+    }
+
+    try {
+      const dadosAtualizados = {
+        name,
+        email,
+        password: password ? password : undefined, // Só envia a senha se o campo não estiver vazio
+      };
+
+      const response = await api.updateUsuario(dadosAtualizados); // Ajuste esse endpoint conforme sua API
+
+      Alert.alert("Sucesso", "Dados atualizados com sucesso!");
+      setPassword(""); // Limpa o campo de senha por segurança
+    } catch (error) {
+      console.log(error);
+      Alert.alert("Erro", "Não foi possível atualizar os dados.");
+    }
   }
 
   return (
@@ -35,7 +60,6 @@ export default function PerfilUsuario() {
       <Text style={styles.title}>MEU PERFIL</Text>
 
       <View style={styles.card}>
-        {/* Campo para o nome */}
         <Text style={styles.label}>Nome:</Text>
         <TextInput
           style={styles.input}
@@ -44,28 +68,26 @@ export default function PerfilUsuario() {
           placeholder="Digite seu nome"
         />
 
-        {/* Campo para o email */}
         <Text style={styles.label}>Email:</Text>
         <TextInput
           style={styles.input}
           value={email}
           onChangeText={setEmail}
           placeholder="Digite seu email"
+          keyboardType="email-address"
         />
 
-        {/* Campo para a senha */}
-        <Text style={styles.label}>Senha:</Text>
+        <Text style={styles.label}>Senha (opcional):</Text>
         <TextInput
           style={styles.input}
           value={password}
           onChangeText={setPassword}
-          placeholder="Digite sua senha"
-          secureTextEntry={true}
+          placeholder="Digite sua nova senha"
+          secureTextEntry
         />
 
-        {/* Botão para salvar as alterações */}
         <TouchableOpacity style={styles.botaoSalvar} onPress={handleUpdate}>
-          <Text style={styles.botaoTexto}>Atualizar</Text>
+          <Text style={styles.botaoTexto}>Atualizar Dados</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -79,6 +101,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 20,
+    color: "#d93030",
+  },
   card: {
     backgroundColor: "#FFECEC",
     borderRadius: 15,
@@ -90,17 +118,6 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowRadius: 5,
     elevation: 5,
-  },
-  avatarContainer: {
-    marginBottom: 20,
-    backgroundColor: "#fff",
-    borderRadius: 50,
-    padding: 10,
-  },
-  avatar: {
-    width: 60,
-    height: 60,
-    tintColor: "#FF5A5F",
   },
   label: {
     alignSelf: "flex-start",
@@ -116,32 +133,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 8,
   },
-  buttonContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+  botaoSalvar: {
+    backgroundColor: "#FF5A5F",
+    borderRadius: 20,
+    paddingVertical: 12,
+    paddingHorizontal: 25,
     marginTop: 20,
-    width: "100%",
-  },
-  atualizarButton: {
-    backgroundColor: "#FF5A5F",
-    borderRadius: 20,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    flex: 1,
-    marginRight: 5,
     alignItems: "center",
   },
-  excluirButton: {
-    backgroundColor: "#FF5A5F",
-    borderRadius: 20,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    flex: 1,
-    marginLeft: 5,
-    alignItems: "center",
-  },
-  buttonText: {
+  botaoTexto: {
     color: "#fff",
     fontWeight: "bold",
+    fontSize: 16,
   },
 });

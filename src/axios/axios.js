@@ -5,7 +5,7 @@ import * as SecureStore from "expo-secure-store";
 // Cria uma instância do axios com uma configuração padrão
 const api = axios.create({
   // Define a URL base para as requisições da API
-  baseURL: "http://10.89.240.64:5000/api/reservas/v1",
+  baseURL: "http://10.89.240.80:3000/api/reservas/v1",
 
   // Define os headers padrão para todas as requisições
   headers: {
@@ -34,6 +34,7 @@ const sheets = {
     api.get(`/disponibilidade/${fk_number}/${date}`),
   postReserva: (reserva) => api.post("/schedule/", reserva),
   updateUser: (user) => api.put("/user/", user),
+  getMinhasReservas: () => api.get("/schedule/"),
 };
 
 // Exporta o objeto 'sheets' para que outras partes do código possam usá-lo
