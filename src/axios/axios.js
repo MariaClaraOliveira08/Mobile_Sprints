@@ -40,7 +40,7 @@ const sheets = {
   postReserva: (reserva) => api.post("/schedule/", reserva),
   updateUser: (user) => api.put("/user/", user),
   getMinhasReservas: () => api.get("/schedule/user/:id"),
-  getUsuario: (user) => api.get("", user),
+  getUsuario: (user) => api.get("/user/:id", user),
 };
 
 export default sheets;
