@@ -98,7 +98,7 @@ export default function CriarReserva({ navigation }) {
               !data || !(data instanceof Date) // verifica se data não é um objeto do tipo Date.
               // Isso protege contra erros caso o valor de data seja uma string, número ou qualquer outro tipo incorreto.
                 ? "Selecione a data"
-                : data.toLocaleDateString("pt-BR", {
+                : data.toLocaleDateString( {
                     day: "2-digit",
                     month: "2-digit",
                     year: "numeric",
