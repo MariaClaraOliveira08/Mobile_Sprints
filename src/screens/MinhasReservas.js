@@ -12,8 +12,9 @@ import {
   ScrollView,
   Alert,
 } from "react-native";
-import api from "../axios/axios"; 
-import Layout from "../Components/Layout"; 
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import api from "../axios/axios";
+import Layout from "../Components/Layout";
 
 export default function MinhasReservas() {
   const [reservas, setReservas] = useState([]);
@@ -23,21 +24,34 @@ export default function MinhasReservas() {
 
   const [descricao, setDescricao] = useState("");
   const [dataInicio, setDataInicio] = useState("");
-  const [horaInicio, setHoraInicio] = useState("");
   const [dataFim, setDataFim] = useState("");
-  const [horaFim, setHoraFim] = useState("");
 
-  // Buscar reservas ao carregar a tela
+  const [userId, setUserId] = useState(null);
+
   useEffect(() => {
-    buscarReservas();
+    const carregarUserId = async () => {
+      try {
+        const id = await AsyncStorage.getItem("userId");
+        console.log("ID recuperado:", id);
+        if (id) {
+          setUserId(id);
+          buscarReservas(id);
+        } else {
+          Alert.alert("Erro", "Usuário não identificado.");
+        }
+      } catch (error) {
+        console.log("Erro ao recuperar userId:", error);
+      }
+    };
+
+    carregarUserId();
   }, []);
 
-  // Função para buscar as reservas do usuário
-  async function buscarReservas() {
+  async function buscarReservas(id) {
     try {
-      const response = await api.getMinhasReservas();
-      if (response && response.data && response.data.schedule) {
-        setReservas(response.data.schedule);
+      const response = await api.get(`/schedule/${id}`);
+      if (response.data && response.data.reservas) {
+        setReservas(response.data.reservas);
       } else {
         console.log("Nenhuma reserva encontrada.");
       }
@@ -49,43 +63,37 @@ export default function MinhasReservas() {
     }
   }
 
-  // Abrir o modal para editar reserva
   function abrirModal(reserva) {
     setReservaSelecionada(reserva);
-    setDescricao(reserva.description);
-    setDataInicio(reserva.start_date);
-    setHoraInicio(reserva.start_time);
-    setDataFim(reserva.end_date);
-    setHoraFim(reserva.end_time);
+    setDescricao(reserva.descricao);
+    setDataInicio(reserva.inicio_periodo);
+    setDataFim(reserva.fim_periodo);
     setModalVisible(true);
   }
 
-  // Função para atualizar uma reserva
   async function atualizarReserva() {
     try {
-      await api.atualizarReserva(reservaSelecionada.id, {
-        description: descricao,
-        start_date: dataInicio,
-        start_time: horaInicio,
-        end_date: dataFim,
-        end_time: horaFim,
+      await api.put(`/schedule/${reservaSelecionada.id_schedule}`, {
+        descricao: descricao,
+        inicio_periodo: dataInicio,
+        fim_periodo: dataFim,
       });
 
       Alert.alert("Sucesso", "Reserva atualizada!");
       setModalVisible(false);
-      buscarReservas();
+      buscarReservas(userId);
     } catch (error) {
       console.log("Erro ao atualizar reserva:", error);
       Alert.alert("Erro", "Não foi possível atualizar.");
     }
   }
 
-  // Função para excluir uma reserva
   async function excluirReserva(id) {
     try {
-      await api.deletarReserva(id);
+      await api.delete(`/schedule/${id}`);
       Alert.alert("Sucesso", "Reserva excluída!");
-      buscarReservas();
+      setModalVisible(false);
+      buscarReservas(userId);
     } catch (error) {
       console.log("Erro ao excluir reserva:", error);
       Alert.alert("Erro", "Não foi possível excluir.");
@@ -100,7 +108,7 @@ export default function MinhasReservas() {
         <View style={styles.headerRow}>
           <Text style={styles.headerText}>Sala</Text>
           <Text style={styles.headerText}>Descrição</Text>
-          <Text style={styles.headerText}>Data</Text>
+          <Text style={styles.headerText}>Período</Text>
         </View>
 
         {loading ? (
@@ -108,14 +116,14 @@ export default function MinhasReservas() {
         ) : (
           <FlatList
             data={reservas}
-            keyExtractor={(item) => item.id.toString()}
+            keyExtractor={(item) => item.id_schedule.toString()}
             renderItem={({ item }) => (
               <TouchableOpacity onPress={() => abrirModal(item)}>
                 <View style={styles.row}>
-                  <Text style={styles.cell}>{item.classroom}</Text>
-                  <Text style={styles.cell}>{item.description}</Text>
+                  <Text style={styles.cell}>{item.sala}</Text>
+                  <Text style={styles.cell}>{item.descricao}</Text>
                   <Text style={styles.cell}>
-                    {item.start_date} {item.start_time}
+                    {item.inicio_periodo} - {item.fim_periodo}
                   </Text>
                 </View>
               </TouchableOpacity>
@@ -123,7 +131,6 @@ export default function MinhasReservas() {
           />
         )}
 
-        {/* Modal para editar ou excluir */}
         <Modal
           visible={modalVisible}
           transparent={true}
@@ -145,25 +152,13 @@ export default function MinhasReservas() {
                   style={styles.input}
                   value={dataInicio}
                   onChangeText={setDataInicio}
-                  placeholder="Data de início (YYYY-MM-DD)"
-                />
-                <TextInput
-                  style={styles.input}
-                  value={horaInicio}
-                  onChangeText={setHoraInicio}
-                  placeholder="Hora de início (HH:MM)"
+                  placeholder="Início (YYYY-MM-DD)"
                 />
                 <TextInput
                   style={styles.input}
                   value={dataFim}
                   onChangeText={setDataFim}
-                  placeholder="Data de fim (YYYY-MM-DD)"
-                />
-                <TextInput
-                  style={styles.input}
-                  value={horaFim}
-                  onChangeText={setHoraFim}
-                  placeholder="Hora de fim (HH:MM)"
+                  placeholder="Fim (YYYY-MM-DD)"
                 />
 
                 <Button
@@ -174,7 +169,7 @@ export default function MinhasReservas() {
                 <Button
                   title="Excluir"
                   color="#dc3545"
-                  onPress={() => excluirReserva(reservaSelecionada.id)}
+                  onPress={() => excluirReserva(reservaSelecionada.id_schedule)}
                 />
                 <Button
                   title="Fechar"
@@ -197,17 +192,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  card: {
-    backgroundColor: "#FFECEC",
-    borderRadius: 12,
-    padding: 20,
-    width: "85%",
-    elevation: 5, // para sombra no Android
-    shadowColor: "#000", // para sombra no iOS
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
-  },
   title: {
     fontSize: 24,
     fontWeight: "bold",
@@ -215,39 +199,53 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 20,
   },
-  input: {
-    backgroundColor: "white",
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: "#FFECEC",
-    color: "#333",
-  },
-  buttonContainer: {
+  headerRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginTop: 10,
+    paddingHorizontal: 10,
+    width: "90%",
+    marginBottom: 10,
   },
-  updateButton: {
-    backgroundColor: "#E63946",
-    borderRadius: 30,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    alignItems: "center",
-  },
-  deleteButton: {
-    backgroundColor: "#E63946",
-    borderRadius: 30,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 5,
-  },
-  buttonText: {
-    color: "white",
+  headerText: {
     fontWeight: "bold",
+    color: "#fff",
+    width: "30%",
+    textAlign: "center",
+  },
+  row: {
+    flexDirection: "row",
+    backgroundColor: "#FFECEC",
+    borderRadius: 10,
+    padding: 10,
+    marginBottom: 10,
+    width: "90%",
+    justifyContent: "space-between",
+  },
+  cell: {
+    width: "30%",
+    textAlign: "center",
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalContainer: {
+    backgroundColor: "white",
+    borderRadius: 10,
+    padding: 20,
+    width: "80%",
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 10,
+  },
+  input: {
+    backgroundColor: "#f0f0f0",
+    padding: 10,
+    borderRadius: 8,
+    marginBottom: 10,
   },
 });

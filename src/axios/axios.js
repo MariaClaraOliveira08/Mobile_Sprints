@@ -20,12 +20,13 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response && error.response.status === 403) {
-      console.warn("Erro 403 - Acesso negado. Token pode estar inválido ou expirado.");
+      console.warn(
+        "Erro 403 - Acesso negado. Token pode estar inválido ou expirado."
+      );
     }
     return Promise.reject(error);
   }
@@ -39,8 +40,10 @@ const sheets = {
     api.get(`/disponibilidade/${fk_number}/${date}`),
   postReserva: (reserva) => api.post("/schedule/", reserva),
   updateUser: (user) => api.put("/user/", user),
-  getMinhasReservas: () => api.get("/schedule/user/:id"),
-  getUsuario: (user) => api.get("/user/:id", user),
+  getMinhasReservas: (userId) => api.get(`/schedule/user/${userId}`),
+  getUsuario: () => api.get(),
+  atualizarReserva: (id, dados) => api.put(`/schedule/${id}`, dados),
+  deletarReserva: (id) => api.delete(`/schedule/${id}`),
 };
 
 export default sheets;
