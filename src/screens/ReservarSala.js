@@ -26,33 +26,37 @@ export default function CriarReserva({ navigation }) {
       return;
     }
 
-    const dataFormatada = data.toISOString().split("T")[0];
-
-    const horaInicioStr = horaInicio
-      .toTimeString()
-      .split(":")
-      .slice(0, 2)
-      .join(":");
-
-    const horaFimStr = horaFim.toTimeString().split(":").slice(0, 2).join(":");
-
-    const inicio_periodo = new Date(`${dataFormatada}T${horaInicioStr}:00`);
-    const fim_periodo = new Date(`${dataFormatada}T${horaFimStr}:00`);
-
-    if (isNaN(inicio_periodo.getTime()) || isNaN(fim_periodo.getTime())) {
-      Alert.alert("Erro", "Horário inválido.");
-      return;
-    }
-
-    const dadosReserva = {
-      fk_id_usuario: 1, 
-      descricao,
-      inicio_periodo: inicio_periodo.toISOString(),
-      fim_periodo: fim_periodo.toISOString(),
-      fk_number: sala,
-    };
-
     try {
+      const dataFormatada = data.toISOString().split("T")[0];
+
+      const horaInicioStr = horaInicio
+        .toTimeString()
+        .split(":")
+        .slice(0, 2)
+        .join(":");
+
+      const horaFimStr = horaFim
+        .toTimeString()
+        .split(":")
+        .slice(0, 2)
+        .join(":");
+
+      const inicio_periodo = new Date(`${dataFormatada}T${horaInicioStr}:00`);
+      const fim_periodo = new Date(`${dataFormatada}T${horaFimStr}:00`);
+
+      if (isNaN(inicio_periodo.getTime()) || isNaN(fim_periodo.getTime())) {
+        Alert.alert("Erro", "Horário inválido.");
+        return;
+      }
+
+      const dadosReserva = {
+        fk_id_usuario: 1,
+        descricao,
+        inicio_periodo: inicio_periodo.toISOString(),
+        fim_periodo: fim_periodo.toISOString(),
+        fk_number: sala,
+      };
+
       setLoading(true);
       const response = await sheets.postReserva(dadosReserva);
       Alert.alert("Sucesso", response.data.message);
@@ -87,22 +91,30 @@ export default function CriarReserva({ navigation }) {
             placeholder="Digite a descrição"
           />
 
-          <Text style={styles.label}>Data:</Text>
+          <Text style={styles.label}>Data da Reserva:</Text>
           <DateTimePicker
             type={"date"}
             buttonTitle={
-              !data ? "Selecione a data da reserva" : data.toLocaleDateString()
+              !data || !(data instanceof Date) // verifica se data não é um objeto do tipo Date.
+              // Isso protege contra erros caso o valor de data seja uma string, número ou qualquer outro tipo incorreto.
+                ? "Selecione a data"
+                : data.toLocaleDateString("pt-BR", {
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "numeric",
+                  })
             }
             setValue={setData}
+            dateKey={"data"}
           />
 
           <Text style={styles.label}>Horário de Início:</Text>
           <DateTimePicker
             type={"time"}
             buttonTitle={
-              !horaInicio
+              !horaInicio || !(horaInicio instanceof Date)
                 ? "Selecione o horário de início"
-                : horaInicio.toLocaleTimeString([], {
+                : horaInicio.toLocaleTimeString("pt-BR", {
                     hour: "2-digit",
                     minute: "2-digit",
                   })
@@ -114,9 +126,9 @@ export default function CriarReserva({ navigation }) {
           <DateTimePicker
             type={"time"}
             buttonTitle={
-              !horaFim
+              !horaFim || !(horaFim instanceof Date)
                 ? "Selecione o horário de término"
-                : horaFim.toLocaleTimeString([], {
+                : horaFim.toLocaleTimeString("pt-BR", {
                     hour: "2-digit",
                     minute: "2-digit",
                   })
@@ -130,7 +142,6 @@ export default function CriarReserva({ navigation }) {
             value={sala}
             onChangeText={setSala}
             placeholder="Ex: 101"
-            keyboardType="numeric"
           />
 
           <TouchableOpacity

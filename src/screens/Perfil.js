@@ -7,10 +7,12 @@ import {
   StyleSheet,
   Alert,
 } from "react-native";
-import api from "../axios/axios"; 
+import Icon from "react-native-vector-icons/MaterialIcons";
+import api from "../axios/axios";
 
 export default function PerfilUsuario() {
   const [name, setName] = useState("");
+  const [cpf, setCpf] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -20,12 +22,11 @@ export default function PerfilUsuario() {
 
   async function carregarDadosUsuario() {
     try {
-      const response = await api.getUsuario(); // Verifique se essa rota existe no seu backend
+      const response = await api.getUsuario();
       const usuario = response.data.user;
 
       setName(usuario.name);
       setEmail(usuario.email);
-      // Por segurança, normalmente a senha não vem preenchida
     } catch (error) {
       Alert.alert("Erro", "Não foi possível carregar os dados do usuário.");
       console.log(error);
@@ -42,13 +43,13 @@ export default function PerfilUsuario() {
       const dadosAtualizados = {
         name,
         email,
-        password: password ? password : undefined, // Só envia a senha se o campo não estiver vazio
+        password: password ? password : undefined,
       };
 
-      const response = await api.updateUsuario(dadosAtualizados); // Ajuste esse endpoint conforme sua API
+      const response = await api.updateUsuario(dadosAtualizados);
 
       Alert.alert("Sucesso", "Dados atualizados com sucesso!");
-      setPassword(""); // Limpa o campo de senha por segurança
+      setPassword("");
     } catch (error) {
       console.log(error);
       Alert.alert("Erro", "Não foi possível atualizar os dados.");
@@ -59,13 +60,26 @@ export default function PerfilUsuario() {
     <View style={styles.container}>
       <Text style={styles.title}>MEU PERFIL</Text>
 
+      {/* Avatar */}
+      <View style={styles.avatarContainer}>
+        <Icon name="person" size={80} color="#f88" />
+      </View>
+
       <View style={styles.card}>
         <Text style={styles.label}>Nome:</Text>
         <TextInput
           style={styles.input}
           value={name}
           onChangeText={setName}
-          placeholder="Digite seu nome"
+          editable={true}
+        />
+
+        <Text style={styles.label}>CPF:</Text>
+        <TextInput
+          style={styles.input}
+          value={cpf}
+          onChangeText={setCpf}
+          editable={false}
         />
 
         <Text style={styles.label}>Email:</Text>
@@ -73,15 +87,16 @@ export default function PerfilUsuario() {
           style={styles.input}
           value={email}
           onChangeText={setEmail}
-          placeholder="Digite seu email"
+          editable={true}
           keyboardType="email-address"
         />
 
-        <Text style={styles.label}>Senha (opcional):</Text>
+        <Text style={styles.label}>Senha:</Text>
         <TextInput
           style={styles.input}
           value={password}
           onChangeText={setPassword}
+          editable={true}
           placeholder="Digite sua nova senha"
           secureTextEntry
         />
@@ -104,8 +119,17 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: "bold",
-    marginBottom: 20,
+    marginBottom: 10,
     color: "#d93030",
+  },
+  avatarContainer: {
+    backgroundColor: "#FFECEC",
+    borderRadius: 100,
+    width: 100,
+    height: 100,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 15,
   },
   card: {
     backgroundColor: "#FFECEC",

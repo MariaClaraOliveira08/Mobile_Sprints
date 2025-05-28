@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import { View, Button } from "react-native";
 import DateTimePicker from "react-native-modal-datetime-picker";
 
-const DateTimePickerDefault = ({ type, buttonTitle, dateKey, setValue }) => {
-  const [isDatePickerVisable, setDatePickerVisibility] = useState(false);
+const DateTimePickerDefault = ({ type, buttonTitle, setValue }) => {
+  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
 
   const showDatePicker = () => {
     setDatePickerVisibility(true);
@@ -14,10 +14,7 @@ const DateTimePickerDefault = ({ type, buttonTitle, dateKey, setValue }) => {
   };
 
   const handleConfirm = (data) => {
-    setValue((prevState) => ({
-      ...prevState,
-      [dateKey]: data, // Salva sempre como objeto Date
-    }));
+    setValue(data); // Corrigido: atualiza diretamente
     hideDatePicker();
   };
 
@@ -25,7 +22,7 @@ const DateTimePickerDefault = ({ type, buttonTitle, dateKey, setValue }) => {
     <View>
       <Button title={buttonTitle} onPress={showDatePicker} color="#e53935" />
       <DateTimePicker
-        isVisible={isDatePickerVisable}
+        isVisible={isDatePickerVisible}
         mode={type}
         locale="pt_BR"
         onConfirm={handleConfirm}
@@ -36,4 +33,5 @@ const DateTimePickerDefault = ({ type, buttonTitle, dateKey, setValue }) => {
     </View>
   );
 };
+
 export default DateTimePickerDefault;

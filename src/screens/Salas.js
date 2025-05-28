@@ -7,78 +7,75 @@ import {
   ActivityIndicator,
   Modal,
   TouchableOpacity,
-  TextInput,
   Button,
   StatusBar,
   ScrollView,
 } from "react-native";
-import api from "../axios/axios"; // Importa o módulo da API para fazer requisições
-import Layout from "../Components/Layout"; // Importa o Layout padrão do projeto
+import DateTimePicker from "@react-native-community/datetimepicker";
+import api from "../axios/axios";
+import Layout from "../Components/Layout";
 
 export default function SalasDisponiveis({ navigation }) {
-  // Declarando o estado para armazenar salas, controle de loading, e controle de modal
   const [salas, setSalas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
   const [salaSelecionada, setSalaSelecionada] = useState(null);
-  const [dataDigitada, setDataDigitada] = useState("");
+  const [dataSelecionada, setDataSelecionada] = useState(new Date());
+  const [mostrarDatePicker, setMostrarDatePicker] = useState(false);
   const [horarios, setHorarios] = useState([]);
 
-  // Efeito colateral para buscar as salas ao carregar o componente
   useEffect(() => {
     buscarSalas();
   }, []);
 
-  // Função para buscar todas as salas
   async function buscarSalas() {
     try {
-      const response = await api.getSalas(); // Faz a requisição para buscar as salas
+      const response = await api.getSalas();
       if (response && response.data && response.data.classrooms) {
-        setSalas(response.data.classrooms); // Atualiza o estado com os dados das salas
+        setSalas(response.data.classrooms);
       } else {
         console.log("Dados de salas não encontrados");
       }
     } catch (error) {
-      console.log("Erro ao buscar salas:", error); // Exibe erro caso não consiga buscar as salas
+      console.log("Erro ao buscar salas:", error);
     } finally {
-      setLoading(false); // Desativa o loading independentemente do sucesso ou falha da requisição
+      setLoading(false);
     }
   }
 
-  // Função para buscar os horários disponíveis para uma sala e data específica
   async function buscarHorariosDisponiveis() {
-    if (!dataDigitada || !salaSelecionada) return; // Verifica se a data e a sala foram selecionadas
+    if (!dataSelecionada || !salaSelecionada) return;
+
+    const dataFormatada = dataSelecionada.toISOString().split("T")[0]; // Formata para "YYYY-MM-DD"
+
     try {
       const response = await api.getHorariosDisponiveisPorSalaEData(
         salaSelecionada.number,
-        dataDigitada
+        dataFormatada
       );
       if (response && response.data && response.data.time_slots) {
-        setHorarios(response.data.time_slots); // Atualiza o estado com os horários disponíveis
+        setHorarios(response.data.time_slots);
       } else {
         console.log("Nenhum horário disponível encontrado");
       }
     } catch (error) {
-      console.log("Erro ao buscar horários:", error); // Exibe erro caso não consiga buscar os horários
+      console.log("Erro ao buscar horários:", error);
     }
   }
 
-  // Função para renderizar os horários disponíveis
   function renderHorarios() {
     if (horarios.length === 0) {
-      return <Text style={styles.noHorarios}>Nenhum horário disponível</Text>; // Caso não haja horários disponíveis
+      return <Text style={styles.noHorarios}>Nenhum horário disponível</Text>;
     }
 
-    // Mapeia os horários e os exibe como itens clicáveis
     return horarios.map((horario, index) => (
       <TouchableOpacity
         key={index}
         style={styles.horarioItem}
         onPress={() => {
-          // Navega para a tela de "Reservar Sala" com os parâmetros necessários
           navigation.navigate("Reservar Sala", {
             sala: salaSelecionada.number,
-            data: dataDigitada,
+            data: dataSelecionada.toISOString().split("T")[0],
             horaInicio: horario.start_time,
             horaFim: horario.end_time,
           });
@@ -91,13 +88,20 @@ export default function SalasDisponiveis({ navigation }) {
     ));
   }
 
+  // Função para formatar a data em dd/mm/yyyy
+  function formatarData(date) {
+    const dia = date.getDate().toString().padStart(2, "0");
+    const mes = (date.getMonth() + 1).toString().padStart(2, "0");
+    const ano = date.getFullYear();
+    return `${ano}/${mes}/${dia}`;
+  }
+
   return (
     <Layout>
       <StatusBar hidden={false} />
       <View style={styles.container}>
         <Text style={styles.title}>Salas</Text>
 
-        {/* Cabeçalho da tabela de salas */}
         <View style={styles.headerRow}>
           <Text style={styles.headerText}>Número</Text>
           <Text style={styles.headerText}>Descrição</Text>
@@ -105,40 +109,35 @@ export default function SalasDisponiveis({ navigation }) {
         </View>
 
         {loading ? (
-          <ActivityIndicator size="large" color="#F2B7FD" /> // Exibe o indicador de carregamento enquanto as salas são buscadas
+          <ActivityIndicator size="large" color="#F2B7FD" />
         ) : (
-          // Exibe a lista de salas quando o carregamento termina
           <FlatList
-            data={salas} // Dados das salas
-            keyExtractor={(item) => item.number.toString()} // Chave única para cada item
+            data={salas}
+            keyExtractor={(item) => item.number.toString()}
             renderItem={({ item }) => (
               <TouchableOpacity
                 onPress={() => {
-                  // Ao clicar em uma sala, abre o modal para selecionar a data
                   setSalaSelecionada(item);
                   setModalVisible(true);
                   setHorarios([]);
-                  setDataDigitada("");
+                  setDataSelecionada(new Date()); // Define a data atual como padrão
                 }}
               >
                 <View style={styles.row}>
                   <Text style={styles.cell}>{item.number}</Text>
                   <Text style={styles.cell}>{item.description}</Text>
                   <Text style={styles.cell}>{item.capacity}</Text>
-
-                  <Text>{new Date(item.data).toLocaleString}</Text>
                 </View>
               </TouchableOpacity>
             )}
           />
         )}
 
-        {/* Modal para seleção de data e exibição dos horários disponíveis */}
         <Modal
-          visible={modalVisible} // Define se o modal está visível
-          transparent={true} // Torna o fundo do modal transparente
-          animationType="slide" // Define o tipo de animação ao abrir o modal
-          onRequestClose={() => setModalVisible(false)} // Fecha o modal ao pressionar o botão de voltar
+          visible={modalVisible}
+          transparent={true}
+          animationType="slide"
+          onRequestClose={() => setModalVisible(false)}
         >
           <View style={styles.modalOverlay}>
             <View style={styles.modalContainer}>
@@ -146,28 +145,41 @@ export default function SalasDisponiveis({ navigation }) {
                 Sala {salaSelecionada?.number}
               </Text>
 
-              {/* Input para digitar a data */}
-              <Text>Digite a data (YYYY-MM-DD):</Text>
-              <TextInput
-                style={styles.input}
-                value={dataDigitada}
-                onChangeText={setDataDigitada} // Atualiza o estado da data digitada
-                placeholder="Ex: 2025-05-06" // Texto de ajuda para o usuário
-              />
+              <Text>Selecione a data:</Text>
 
-              {/* Botão para buscar os horários disponíveis */}
+              <TouchableOpacity
+                style={styles.dateButton}
+                onPress={() => setMostrarDatePicker(true)}
+              >
+                <Text style={styles.dateButtonText}>
+                  {formatarData(dataSelecionada)}
+                </Text>
+              </TouchableOpacity>
+
+              {mostrarDatePicker && (
+                <DateTimePicker
+                  value={dataSelecionada}
+                  mode="date"
+                  onChange={(event, selectedDate) => {
+                    setMostrarDatePicker(false);
+                    if (selectedDate) {
+                      setDataSelecionada(selectedDate);
+                    }
+                  }}
+                />
+              )}
+
               <Button
                 title="Ver horários disponíveis"
                 color="#fa8075"
                 onPress={buscarHorariosDisponiveis}
               />
+
               <ScrollView>
                 <Text style={styles.horariosTitle}>Horários disponíveis:</Text>
-                {renderHorarios()}{" "}
-                {/* Exibe os horários disponíveis ou a mensagem de nenhum horário */}
+                {renderHorarios()}
               </ScrollView>
 
-              {/* Botão para fechar o modal */}
               <Button
                 title="Fechar"
                 color="#fa8075"
@@ -237,14 +249,16 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 10,
   },
-  input: {
-    width: "100%",
+  dateButton: {
     padding: 10,
-    borderWidth: 1,
-    borderColor: "#fa8072",
+    backgroundColor: "#f8c7c7",
     borderRadius: 6,
     marginTop: 8,
     marginBottom: 10,
+  },
+  dateButtonText: {
+    color: "#333",
+    textAlign: "center",
   },
   horariosTitle: {
     fontWeight: "bold",

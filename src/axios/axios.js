@@ -1,21 +1,16 @@
-// Importa o módulo 'axios' para fazer requisições HTTP
 import axios from "axios";
 import * as SecureStore from "expo-secure-store";
 
-// Cria uma instância do axios com uma configuração padrão
 const api = axios.create({
-  // Define a URL base para as requisições da API
   baseURL: "http://10.89.240.80:3000/api/reservas/v1",
-
-  // Define os headers padrão para todas as requisições
   headers: {
     accept: "application/json",
   },
 });
 
+// Intercepta requisições para adicionar token e tratar erros
 api.interceptors.request.use(
   async (config) => {
-    //aguardando o token ser recuperado
     const token = await SecureStore.getItemAsync("token");
     if (token) {
       config.headers.Authorization = `${token}`;
@@ -25,7 +20,17 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Cria um objeto 'sheets' que contém as funções para fazer as requisições específicas à API
+
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response && error.response.status === 403) {
+      console.warn("Erro 403 - Acesso negado. Token pode estar inválido ou expirado.");
+    }
+    return Promise.reject(error);
+  }
+);
+
 const sheets = {
   postCadastro: (user) => api.post("/user/", user),
   postLogin: (user) => api.post("/user/login", user),
@@ -34,8 +39,8 @@ const sheets = {
     api.get(`/disponibilidade/${fk_number}/${date}`),
   postReserva: (reserva) => api.post("/schedule/", reserva),
   updateUser: (user) => api.put("/user/", user),
-  getMinhasReservas: () => api.get("/schedule/"),
+  getMinhasReservas: () => api.get("/schedule/user/:id"),
+  getUsuario: (user) => api.get("", user),
 };
 
-// Exporta o objeto 'sheets' para que outras partes do código possam usá-lo
 export default sheets;
