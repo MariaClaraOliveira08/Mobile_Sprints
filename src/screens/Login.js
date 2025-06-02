@@ -6,8 +6,8 @@ import {
   TouchableOpacity,
   Alert,
   StyleSheet,
-  Image,
   ImageBackground,
+  Image,
 } from "react-native";
 import api from "../axios/axios";
 import { useNavigation } from "@react-navigation/native";
@@ -32,21 +32,51 @@ export default function Login() {
     }
   }
 
+  async function saveUserId(userId) {
+    try {
+      await SecureStore.setItemAsync("userId", userId.toString());
+      console.log("ID do usuário salvo com sucesso!");
+    } catch (error) {
+      console.error("Erro ao salvar ID do usuário:", error);
+    }
+  }
+
   async function handleLogin() {
     console.log("Dados enviados para login:", user);
 
     try {
       const response = await api.postLogin(user);
-      Alert.alert("Sucesso", response.data.message);
+      console.log("Resposta completa do backend:", response.data);
 
       const token = response.data.token;
-      console.log("TOKEN GERADO:", token); // Verifica token no console
+      const userId = response.data.user?.id_usuario; 
 
-      await saveToken(token); // Espera o token ser salvo
+      if (!token) {
+        Alert.alert("Erro", "Token não recebido. Verifique suas credenciais.");
+        return;
+      }
+
+      if (userId === undefined || userId === null) {
+        console.warn("ID do usuário não encontrado na resposta.");
+      }
+
+      console.log("TOKEN GERADO:", token);
+      console.log("ID DO USUÁRIO:", userId);
+
+      await saveToken(token);
+
+      if (userId !== undefined && userId !== null) {
+        await saveUserId(userId);
+      }
+
+      Alert.alert("Sucesso", response.data.message || "Login realizado!");
       navigation.navigate("Home");
     } catch (error) {
       console.log("Erro no login:", error.response);
-      Alert.alert("Erro", error.response?.data?.error || "Erro inesperado");
+      Alert.alert(
+        "Erro",
+        error.response?.data?.error || "Erro inesperado no login"
+      );
     }
   }
 

@@ -7,14 +7,25 @@ import {
   ActivityIndicator,
   Modal,
   TouchableOpacity,
-  TextInput,
   Button,
   ScrollView,
   Alert,
+  TextInput,
 } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import api from "../axios/axios";
+import * as SecureStore from "expo-secure-store";
+import sheets from "../axios/axios";
 import Layout from "../Components/Layout";
+import DateTimePicker from "../Components/DateTimePicker";
+
+function formatarData(dataString) {
+  const data = new Date(dataString);
+  const dia = data.toLocaleDateString("pt-BR");
+  const hora = data.toLocaleTimeString("pt-BR", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+  return `${dia} - ${hora}`;
+}
 
 export default function MinhasReservas() {
   const [reservas, setReservas] = useState([]);
@@ -23,36 +34,40 @@ export default function MinhasReservas() {
   const [reservaSelecionada, setReservaSelecionada] = useState(null);
 
   const [descricao, setDescricao] = useState("");
-  const [dataInicio, setDataInicio] = useState("");
-  const [dataFim, setDataFim] = useState("");
+  const [dataInicio, setDataInicio] = useState(null);
+  const [dataFim, setDataFim] = useState(null);
 
   const [userId, setUserId] = useState(null);
 
   useEffect(() => {
-    const carregarUserId = async () => {
+    async function carregarUserId() {
       try {
-        const id = await AsyncStorage.getItem("userId");
+        const id = await SecureStore.getItemAsync("userId");
         console.log("ID recuperado:", id);
         if (id) {
           setUserId(id);
           buscarReservas(id);
         } else {
           Alert.alert("Erro", "Usuário não identificado.");
+          setLoading(false);
         }
       } catch (error) {
         console.log("Erro ao recuperar userId:", error);
+        setLoading(false);
       }
-    };
+    }
 
     carregarUserId();
   }, []);
 
   async function buscarReservas(id) {
     try {
-      const response = await api.get(`/schedule/${id}`);
+      const response = await sheets.getMinhasReservas(id);
       if (response.data && response.data.reservas) {
         setReservas(response.data.reservas);
+        console.log(response.data.reservas);
       } else {
+        setReservas([]);
         console.log("Nenhuma reserva encontrada.");
       }
     } catch (error) {
@@ -66,17 +81,23 @@ export default function MinhasReservas() {
   function abrirModal(reserva) {
     setReservaSelecionada(reserva);
     setDescricao(reserva.descricao);
-    setDataInicio(reserva.inicio_periodo);
-    setDataFim(reserva.fim_periodo);
+    setDataInicio(new Date(reserva.inicio_periodo));
+    setDataFim(new Date(reserva.fim_periodo));
     setModalVisible(true);
   }
 
   async function atualizarReserva() {
+    if (!descricao || !dataInicio || !dataFim) {
+      Alert.alert("Erro", "Preencha todos os campos.");
+      return;
+    }
+
     try {
-      await api.put(`/schedule/${reservaSelecionada.id_schedule}`, {
+      await sheets.atualizarReserva(reservaSelecionada.id_schedule, {
+        id_schedule: reservaSelecionada.id_schedule,
         descricao: descricao,
-        inicio_periodo: dataInicio,
-        fim_periodo: dataFim,
+        inicio_periodo: dataInicio.toISOString(),
+        fim_periodo: dataFim.toISOString(),
       });
 
       Alert.alert("Sucesso", "Reserva atualizada!");
@@ -90,7 +111,7 @@ export default function MinhasReservas() {
 
   async function excluirReserva(id) {
     try {
-      await api.delete(`/schedule/${id}`);
+      await sheets.deletarReserva(id);
       Alert.alert("Sucesso", "Reserva excluída!");
       setModalVisible(false);
       buscarReservas(userId);
@@ -123,7 +144,9 @@ export default function MinhasReservas() {
                   <Text style={styles.cell}>{item.sala}</Text>
                   <Text style={styles.cell}>{item.descricao}</Text>
                   <Text style={styles.cell}>
-                    {item.inicio_periodo} - {item.fim_periodo}
+                    {formatarData(item.inicio_periodo)}
+                    {"\n"}até{"\n"}
+                    {formatarData(item.fim_periodo)}
                   </Text>
                 </View>
               </TouchableOpacity>
@@ -142,28 +165,45 @@ export default function MinhasReservas() {
               <Text style={styles.modalTitle}>Editar Reserva</Text>
 
               <ScrollView>
-                <TextInput
+                <Text style={styles.label}>Descrição:</Text>
+                <TouchableOpacity
                   style={styles.input}
-                  value={descricao}
-                  onChangeText={setDescricao}
-                  placeholder="Descrição"
+                  onPress={() => {}}
+                  activeOpacity={1}
+                >
+                  <TextInput
+                    style={{ padding: 0 }}
+                    value={descricao}
+                    onChangeText={setDescricao}
+                    placeholder="Descrição"
+                  />
+                </TouchableOpacity>
+
+                <Text style={styles.label}>Data e Hora de Início:</Text>
+                <DateTimePicker
+                  type="datetime"
+                  buttonTitle={
+                    dataInicio instanceof Date
+                      ? dataInicio.toLocaleString("pt-BR")
+                      : "Selecionar início"
+                  }
+                  setValue={setDataInicio}
                 />
-                <TextInput
-                  style={styles.input}
-                  value={dataInicio}
-                  onChangeText={setDataInicio}
-                  placeholder="Início (YYYY-MM-DD)"
-                />
-                <TextInput
-                  style={styles.input}
-                  value={dataFim}
-                  onChangeText={setDataFim}
-                  placeholder="Fim (YYYY-MM-DD)"
+
+                <Text style={styles.label}>Data e Hora de Término:</Text>
+                <DateTimePicker
+                  type="datetime"
+                  buttonTitle={
+                    dataFim instanceof Date
+                      ? dataFim.toLocaleString("pt-BR")
+                      : "Selecionar término"
+                  }
+                  setValue={setDataFim}
                 />
 
                 <Button
                   title="Atualizar"
-                  color="#28a745"
+                  color="#fa8072"
                   onPress={atualizarReserva}
                 />
                 <Button
@@ -235,12 +275,17 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     borderRadius: 10,
     padding: 20,
-    width: "80%",
+    width: "85%",
   },
   modalTitle: {
     fontSize: 20,
     fontWeight: "bold",
     marginBottom: 10,
+  },
+  label: {
+    marginTop: 10,
+    marginBottom: 5,
+    fontWeight: "bold",
   },
   input: {
     backgroundColor: "#f0f0f0",

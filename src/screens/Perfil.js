@@ -8,13 +8,16 @@ import {
   Alert,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
+import Ionicons from "react-native-vector-icons/Ionicons";
 import api from "../axios/axios";
+import * as SecureStore from "expo-secure-store";
 
 export default function PerfilUsuario() {
   const [name, setName] = useState("");
   const [cpf, setCpf] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     carregarDadosUsuario();
@@ -22,14 +25,22 @@ export default function PerfilUsuario() {
 
   async function carregarDadosUsuario() {
     try {
-      const response = await api.getUsuario();
+      const userId = await SecureStore.getItemAsync("userId");
+      if (!userId) {
+        Alert.alert("Erro", "ID do usuário não encontrado.");
+        return;
+      }
+
+      const response = await api.getUsuario(userId);
       const usuario = response.data.user;
 
-      setName(usuario.name);
-      setEmail(usuario.email);
+      setName(usuario.name || "");
+      setCpf(usuario.cpf || "");
+      setEmail(usuario.email || "");
+      setPassword(usuario.password || "");
     } catch (error) {
       Alert.alert("Erro", "Não foi possível carregar os dados do usuário.");
-      console.log(error);
+      console.log("Erro ao carregar usuário:", error);
     }
   }
 
@@ -43,15 +54,24 @@ export default function PerfilUsuario() {
       const dadosAtualizados = {
         name,
         email,
-        password: password ? password : undefined,
       };
 
-      const response = await api.updateUsuario(dadosAtualizados);
+      if (password) {
+        dadosAtualizados.password = password;
+      }
+
+      const userId = await SecureStore.getItemAsync("userId");
+      if (!userId) {
+        Alert.alert("Erro", "ID do usuário não encontrado.");
+        return;
+      }
+
+      await api.updateUser(userId, dadosAtualizados);
 
       Alert.alert("Sucesso", "Dados atualizados com sucesso!");
       setPassword("");
     } catch (error) {
-      console.log(error);
+      console.log("Erro ao atualizar usuário:", error);
       Alert.alert("Erro", "Não foi possível atualizar os dados.");
     }
   }
@@ -60,7 +80,6 @@ export default function PerfilUsuario() {
     <View style={styles.container}>
       <Text style={styles.title}>MEU PERFIL</Text>
 
-      {/* Avatar */}
       <View style={styles.avatarContainer}>
         <Icon name="person" size={80} color="#f88" />
       </View>
@@ -71,39 +90,42 @@ export default function PerfilUsuario() {
           style={styles.input}
           value={name}
           onChangeText={setName}
-          editable={true}
+          editable={false}
         />
 
         <Text style={styles.label}>CPF:</Text>
-        <TextInput
-          style={styles.input}
-          value={cpf}
-          onChangeText={setCpf}
-          editable={false}
-        />
+        <TextInput style={styles.input} value={cpf} editable={false} />
 
         <Text style={styles.label}>Email:</Text>
         <TextInput
           style={styles.input}
           value={email}
           onChangeText={setEmail}
-          editable={true}
+          editable={false}
           keyboardType="email-address"
         />
 
         <Text style={styles.label}>Senha:</Text>
-        <TextInput
-          style={styles.input}
-          value={password}
-          onChangeText={setPassword}
-          editable={true}
-          placeholder="Digite sua nova senha"
-          secureTextEntry
-        />
+        <View style={styles.inputSenhaContainer}>
+          <TextInput
+            style={styles.inputSenha}
+            value={password}
+            onChangeText={setPassword}
+            editable={false}
+            secureTextEntry={!showPassword}
+          />
+          <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+            <Ionicons
+              name={showPassword ? "eye-off" : "eye"}
+              size={22}
+              color="gray"
+            />
+          </TouchableOpacity>
+        </View>
 
-        <TouchableOpacity style={styles.botaoSalvar} onPress={handleUpdate}>
+        {/* <TouchableOpacity style={styles.botaoSalvar} onPress={handleUpdate}>
           <Text style={styles.botaoTexto}>Atualizar Dados</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
     </View>
   );
@@ -156,6 +178,18 @@ const styles = StyleSheet.create({
     width: "100%",
     paddingHorizontal: 10,
     paddingVertical: 8,
+  },
+  inputSenhaContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#fff",
+    borderRadius: 8,
+    width: "100%",
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+  },
+  inputSenha: {
+    flex: 1,
   },
   botaoSalvar: {
     backgroundColor: "#FF5A5F",

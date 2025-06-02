@@ -39,10 +39,13 @@ const sheets = {
   getHorariosDisponiveisPorSalaEData: (fk_number, date) =>
     api.get(`/disponibilidade/${fk_number}/${date}`),
   postReserva: (reserva) => api.post("/schedule/", reserva),
-  updateUser: (user) => api.put("/user/", user),
+  updateUser: (userId, user) => api.put(`/user/${userId}`, user),
   getMinhasReservas: (userId) => api.get(`/schedule/user/${userId}`),
-  getUsuario: () => api.get(),
-  atualizarReserva: (id, dados) => api.put(`/schedule/${id}`, dados),
+  getUsuario: (userId) => api.get(`/user/${userId}`),
+  atualizarReserva: (id, data) => {
+    const dataComId = { ...data, id_schedule: id };
+    return api.put(`/schedule/`, dataComId);
+  },
   deletarReserva: (id) => api.delete(`/schedule/${id}`),
 };
 
