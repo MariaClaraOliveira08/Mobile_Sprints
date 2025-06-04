@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
 import Layout from "../Components/Layout";
 import { StatusBar } from "react-native";
 
@@ -23,9 +23,7 @@ function Home({ navigation }) {
           >
             <Text style={styles.buttonText}>Reservas</Text>
           </TouchableOpacity>
-
         </View>
-
 
         {/* Título e subtítulo logo abaixo dos botões */}
         <Text style={styles.title}>BEM-VINDO AO SITE!</Text>
@@ -33,14 +31,23 @@ function Home({ navigation }) {
         <Text style={styles.subtitle}>SENAI FRANCA–SP</Text>
         <View style={styles.line2}></View>
 
+        <Image
+          source={require("../../assets/escola.jpg")}
+          style={styles.imagem}
+        ></Image>
+
         {/* Linha abaixo do título e subtítulo */}
-        
       </View>
     </Layout>
   );
 }
 
 const styles = StyleSheet.create({
+  image: {
+    width: 600,
+    height: 400,
+    boxShadow: "0px 4px 10px rgba(0,0,0,0.4)",
+  },
   container: {
     flex: 1,
     paddingTop: 40,

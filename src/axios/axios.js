@@ -38,15 +38,11 @@ const sheets = {
   getSalas: () => api.get("/classroom/"),
   getHorariosDisponiveisPorSalaEData: (fk_number, date) =>
     api.get(`/disponibilidade/${fk_number}/${date}`),
-  postReserva: (reserva) => api.post("/schedule/", reserva),
+  postReserva: (reserva) => api.post("/schedules/", reserva),
   updateUser: (userId, user) => api.put(`/user/${userId}`, user),
   getMinhasReservas: (userId) => api.get(`/schedule/user/${userId}`),
   getUsuario: (userId) => api.get(`/user/${userId}`),
-  atualizarReserva: (id, data) => {
-    const dataComId = { ...data, id_schedule: id };
-    return api.put(`/schedule/`, dataComId);
-  },
-  deletarReserva: (id) => api.delete(`/schedule/${id}`),
+  deletarReserva: (id) => api.delete(`/schedules/${id}`),
 };
 
 export default sheets;

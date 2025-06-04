@@ -46,7 +46,7 @@ export default function SalasDisponiveis({ navigation }) {
   async function buscarHorariosDisponiveis() {
     if (!dataSelecionada || !salaSelecionada) return;
 
-    const dataFormatada = dataSelecionada.toISOString().split("T")[0]; // Formata para "YYYY-MM-DD"
+    const dataFormatada = formatarDataAPI(dataSelecionada); // <-- formato para API (YYYY-MM-DD)
 
     try {
       const response = await api.getHorariosDisponiveisPorSalaEData(
@@ -56,6 +56,7 @@ export default function SalasDisponiveis({ navigation }) {
       if (response && response.data && response.data.time_slots) {
         setHorarios(response.data.time_slots);
       } else {
+        setHorarios([]);
         console.log("Nenhum horário disponível encontrado");
       }
     } catch (error) {
@@ -74,11 +75,12 @@ export default function SalasDisponiveis({ navigation }) {
         style={styles.horarioItem}
         onPress={() => {
           navigation.navigate("Reservar Sala", {
-            sala: salaSelecionada.number,
-            data: dataSelecionada.toISOString().split("T")[0],
+            salaId: salaSelecionada.number,
+            data: formatarDataAPI(dataSelecionada), // <-- formato para API
             horaInicio: horario.start_time,
             horaFim: horario.end_time,
           });
+          setModalVisible(false);
         }}
       >
         <Text style={styles.horarioText}>
@@ -88,12 +90,27 @@ export default function SalasDisponiveis({ navigation }) {
     ));
   }
 
-  // Função para formatar a data em dd/mm/yyyy
-  function formatarData(date) {
-    const dia = date.getDate().toString().padStart(2, "0");
-    const mes = (date.getMonth() + 1).toString().padStart(2, "0");
-    const ano = date.getFullYear();
-    return `${ano}/${mes}/${dia}`;
+  // para exibir no front - dd/mm/aaaa
+  function formatarDataBR(data) {
+    const dia = String(data.getDate()).padStart(2, "0");
+    const mes = String(data.getMonth() + 1).padStart(2, "0");
+    const ano = data.getFullYear();
+    return `${dia}/${mes}/${ano}`;
+  }
+
+  // para enviar para API YYYY-MM-DD
+  function formatarDataAPI(data) {
+    const dia = String(data.getDate()).padStart(2, "0");
+    const mes = String(data.getMonth() + 1).padStart(2, "0");
+    const ano = data.getFullYear();
+    return `${ano}-${mes}-${dia}`;
+  }
+
+  function fecharModal() {
+    setModalVisible(false);
+    setSalaSelecionada(null);
+    setHorarios([]);
+    setDataSelecionada(new Date());
   }
 
   return (
@@ -120,7 +137,7 @@ export default function SalasDisponiveis({ navigation }) {
                   setSalaSelecionada(item);
                   setModalVisible(true);
                   setHorarios([]);
-                  setDataSelecionada(new Date()); // Define a data atual como padrão
+                  setDataSelecionada(new Date());
                 }}
               >
                 <View style={styles.row}>
@@ -137,7 +154,7 @@ export default function SalasDisponiveis({ navigation }) {
           visible={modalVisible}
           transparent={true}
           animationType="slide"
-          onRequestClose={() => setModalVisible(false)}
+          onRequestClose={fecharModal}
         >
           <View style={styles.modalOverlay}>
             <View style={styles.modalContainer}>
@@ -152,7 +169,7 @@ export default function SalasDisponiveis({ navigation }) {
                 onPress={() => setMostrarDatePicker(true)}
               >
                 <Text style={styles.dateButtonText}>
-                  {formatarData(dataSelecionada)}
+                  {formatarDataBR(dataSelecionada)}
                 </Text>
               </TouchableOpacity>
 
@@ -164,6 +181,7 @@ export default function SalasDisponiveis({ navigation }) {
                     setMostrarDatePicker(false);
                     if (selectedDate) {
                       setDataSelecionada(selectedDate);
+                      setHorarios([]);
                     }
                   }}
                 />
@@ -175,16 +193,12 @@ export default function SalasDisponiveis({ navigation }) {
                 onPress={buscarHorariosDisponiveis}
               />
 
-              <ScrollView>
+              <ScrollView style={{ maxHeight: 200, marginTop: 10 }}>
                 <Text style={styles.horariosTitle}>Horários disponíveis:</Text>
                 {renderHorarios()}
               </ScrollView>
 
-              <Button
-                title="Fechar"
-                color="#fa8075"
-                onPress={() => setModalVisible(false)}
-              />
+              <Button title="Fechar" color="#fa8075" onPress={fecharModal} />
             </View>
           </View>
         </Modal>
@@ -255,6 +269,7 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     marginTop: 8,
     marginBottom: 10,
+    width: 150,
   },
   dateButtonText: {
     color: "#333",

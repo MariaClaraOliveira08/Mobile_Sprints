@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -12,13 +12,21 @@ import sheets from "../axios/axios";
 import Layout from "../Components/Layout";
 import DateTimePicker from "../Components/DateTimePicker";
 
-export default function CriarReserva({ navigation }) {
+export default function CriarReserva({ navigation, route }) {
+  const { salaId, salaDescricao } = route.params || {};
+
   const [descricao, setDescricao] = useState("");
   const [data, setData] = useState(null);
   const [horaInicio, setHoraInicio] = useState(null);
   const [horaFim, setHoraFim] = useState(null);
-  const [sala, setSala] = useState("");
+  const [sala, setSala] = useState(salaId ? salaId.toString() : "");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (salaId) {
+      setSala(salaId.toString());
+    }
+  }, [salaId]);
 
   const handleReserva = async () => {
     if (!descricao || !data || !horaInicio || !horaFim || !sala) {
@@ -74,16 +82,21 @@ export default function CriarReserva({ navigation }) {
     setData(null);
     setHoraInicio(null);
     setHoraFim(null);
-    setSala("");
+    if (!salaId) setSala("");
   };
 
   return (
     <Layout>
       <View style={styles.container}>
         <StatusBar hidden={false} />
-        <Text style={styles.title}>Reserva</Text>
+        <Text style={styles.title}>Reserva da Sala</Text>
         <View style={styles.card}>
-          <Text style={styles.label}>Descrição:</Text>
+          <Text style={styles.label}>Sala:</Text>
+          <Text style={styles.salaInfo}>
+            {sala} {salaDescricao ? `- ${salaDescricao}` : ""}
+          </Text>
+
+          <Text style={styles.label}>Descrição da Reserva:</Text>
           <TextInput
             style={styles.input}
             value={descricao}
@@ -95,14 +108,9 @@ export default function CriarReserva({ navigation }) {
           <DateTimePicker
             type={"date"}
             buttonTitle={
-              !data || !(data instanceof Date) // verifica se data não é um objeto do tipo Date.
-              // Isso protege contra erros caso o valor de data seja uma string, número ou qualquer outro tipo incorreto.
+              !data || !(data instanceof Date)
                 ? "Selecione a data"
-                : data.toLocaleDateString( {
-                    day: "2-digit",
-                    month: "2-digit",
-                    year: "numeric",
-                  })
+                : data.toLocaleDateString("pt-BR")
             }
             setValue={setData}
             dateKey={"data"}
@@ -136,13 +144,7 @@ export default function CriarReserva({ navigation }) {
             setValue={setHoraFim}
           />
 
-          <Text style={styles.label}>Número da Sala:</Text>
-          <TextInput
-            style={styles.input}
-            value={sala}
-            onChangeText={setSala}
-            placeholder="Ex: 101"
-          />
+          <View style={{ height: 15 }} />
 
           <TouchableOpacity
             style={styles.reservarBtn}
@@ -175,6 +177,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#d93030",
     marginBottom: 20,
+    textAlign: "center",
   },
   card: {
     backgroundColor: "#fbb",
@@ -188,6 +191,16 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 5,
     color: "#333",
+  },
+  salaInfo: {
+    width: "100%",
+    backgroundColor: "#eee",
+    borderRadius: 10,
+    padding: 10,
+    marginBottom: 15,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    color: "#555",
   },
   input: {
     width: "100%",

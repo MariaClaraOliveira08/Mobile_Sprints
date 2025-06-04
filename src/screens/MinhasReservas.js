@@ -8,14 +8,11 @@ import {
   Modal,
   TouchableOpacity,
   Button,
-  ScrollView,
   Alert,
-  TextInput,
 } from "react-native";
 import * as SecureStore from "expo-secure-store";
 import sheets from "../axios/axios";
 import Layout from "../Components/Layout";
-import DateTimePicker from "../Components/DateTimePicker";
 
 function formatarData(dataString) {
   const data = new Date(dataString);
@@ -32,18 +29,12 @@ export default function MinhasReservas() {
   const [loading, setLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
   const [reservaSelecionada, setReservaSelecionada] = useState(null);
-
-  const [descricao, setDescricao] = useState("");
-  const [dataInicio, setDataInicio] = useState(null);
-  const [dataFim, setDataFim] = useState(null);
-
   const [userId, setUserId] = useState(null);
 
   useEffect(() => {
     async function carregarUserId() {
       try {
         const id = await SecureStore.getItemAsync("userId");
-        console.log("ID recuperado:", id);
         if (id) {
           setUserId(id);
           buscarReservas(id);
@@ -56,7 +47,6 @@ export default function MinhasReservas() {
         setLoading(false);
       }
     }
-
     carregarUserId();
   }, []);
 
@@ -65,10 +55,8 @@ export default function MinhasReservas() {
       const response = await sheets.getMinhasReservas(id);
       if (response.data && response.data.reservas) {
         setReservas(response.data.reservas);
-        console.log(response.data.reservas);
       } else {
         setReservas([]);
-        console.log("Nenhuma reserva encontrada.");
       }
     } catch (error) {
       console.log("Erro ao buscar reservas:", error);
@@ -80,33 +68,7 @@ export default function MinhasReservas() {
 
   function abrirModal(reserva) {
     setReservaSelecionada(reserva);
-    setDescricao(reserva.descricao);
-    setDataInicio(new Date(reserva.inicio_periodo));
-    setDataFim(new Date(reserva.fim_periodo));
     setModalVisible(true);
-  }
-
-  async function atualizarReserva() {
-    if (!descricao || !dataInicio || !dataFim) {
-      Alert.alert("Erro", "Preencha todos os campos.");
-      return;
-    }
-
-    try {
-      await sheets.atualizarReserva(reservaSelecionada.id_schedule, {
-        id_schedule: reservaSelecionada.id_schedule,
-        descricao: descricao,
-        inicio_periodo: dataInicio.toISOString(),
-        fim_periodo: dataFim.toISOString(),
-      });
-
-      Alert.alert("Sucesso", "Reserva atualizada!");
-      setModalVisible(false);
-      buscarReservas(userId);
-    } catch (error) {
-      console.log("Erro ao atualizar reserva:", error);
-      Alert.alert("Erro", "Não foi possível atualizar.");
-    }
   }
 
   async function excluirReserva(id) {
@@ -162,61 +124,45 @@ export default function MinhasReservas() {
         >
           <View style={styles.modalOverlay}>
             <View style={styles.modalContainer}>
-              <Text style={styles.modalTitle}>Editar Reserva</Text>
+              <Text style={styles.modalTitle}>Detalhes da Reserva</Text>
 
-              <ScrollView>
-                <Text style={styles.label}>Descrição:</Text>
-                <TouchableOpacity
-                  style={styles.input}
-                  onPress={() => {}}
-                  activeOpacity={1}
-                >
-                  <TextInput
-                    style={{ padding: 0 }}
-                    value={descricao}
-                    onChangeText={setDescricao}
-                    placeholder="Descrição"
-                  />
-                </TouchableOpacity>
+              <Text style={{ marginBottom: 20 }}>
+                Sala: {reservaSelecionada?.sala}
+                {"\n"}
+                Descrição: {reservaSelecionada?.descricao}
+                {"\n"}
+                Período:{"\n"}
+                {reservaSelecionada
+                  ? `${formatarData(
+                      reservaSelecionada.inicio_periodo
+                    )} até ${formatarData(reservaSelecionada.fim_periodo)}`
+                  : ""}
+              </Text>
 
-                <Text style={styles.label}>Data e Hora de Início:</Text>
-                <DateTimePicker
-                  type="datetime"
-                  buttonTitle={
-                    dataInicio instanceof Date
-                      ? dataInicio.toLocaleString("pt-BR")
-                      : "Selecionar início"
-                  }
-                  setValue={setDataInicio}
-                />
-
-                <Text style={styles.label}>Data e Hora de Término:</Text>
-                <DateTimePicker
-                  type="datetime"
-                  buttonTitle={
-                    dataFim instanceof Date
-                      ? dataFim.toLocaleString("pt-BR")
-                      : "Selecionar término"
-                  }
-                  setValue={setDataFim}
-                />
-
-                <Button
-                  title="Atualizar"
-                  color="#fa8072"
-                  onPress={atualizarReserva}
-                />
-                <Button
-                  title="Excluir"
-                  color="#dc3545"
-                  onPress={() => excluirReserva(reservaSelecionada.id_schedule)}
-                />
-                <Button
-                  title="Fechar"
-                  color="#fa8072"
-                  onPress={() => setModalVisible(false)}
-                />
-              </ScrollView>
+              <Button
+                title="Excluir"
+                color="#dc3545"
+                onPress={() =>
+                  Alert.alert(
+                    "Confirmar exclusão",
+                    "Tem certeza que deseja excluir esta reserva?",
+                    [
+                      { text: "Cancelar", style: "cancel" },
+                      {
+                        text: "Excluir",
+                        style: "destructive",
+                        onPress: () =>
+                          excluirReserva(reservaSelecionada.id_schedule),
+                      },
+                    ]
+                  )
+                }
+              />
+              <Button
+                title="Fechar"
+                color="#fa8072"
+                onPress={() => setModalVisible(false)}
+              />
             </View>
           </View>
         </Modal>
@@ -280,17 +226,6 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 20,
     fontWeight: "bold",
-    marginBottom: 10,
-  },
-  label: {
-    marginTop: 10,
-    marginBottom: 5,
-    fontWeight: "bold",
-  },
-  input: {
-    backgroundColor: "#f0f0f0",
-    padding: 10,
-    borderRadius: 8,
     marginBottom: 10,
   },
 });
