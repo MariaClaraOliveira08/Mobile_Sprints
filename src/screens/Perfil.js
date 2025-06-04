@@ -44,6 +44,38 @@ export default function PerfilUsuario() {
     }
   }
 
+  async function handleUpdate() {
+    if (!name || !email) {
+      Alert.alert("Atenção", "Preencha todos os campos obrigatórios.");
+      return;
+    }
+
+    try {
+      const dadosAtualizados = {
+        name,
+        email,
+      };
+
+      if (password) {
+        dadosAtualizados.password = password;
+      }
+
+      const userId = await SecureStore.getItemAsync("userId");
+      if (!userId) {
+        Alert.alert("Erro", "ID do usuário não encontrado.");
+        return;
+      }
+
+      await api.updateUser(userId, dadosAtualizados);
+
+      Alert.alert("Sucesso", "Dados atualizados com sucesso!");
+      setPassword("");
+    } catch (error) {
+      console.log("Erro ao atualizar usuário:", error);
+      Alert.alert("Erro", "Não foi possível atualizar os dados.");
+    }
+  }
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>MEU PERFIL</Text>
@@ -58,7 +90,7 @@ export default function PerfilUsuario() {
           style={styles.input}
           value={name}
           onChangeText={setName}
-          editable={false}
+          editable={true}
         />
 
         <Text style={styles.label}>CPF:</Text>
@@ -69,7 +101,7 @@ export default function PerfilUsuario() {
           style={styles.input}
           value={email}
           onChangeText={setEmail}
-          editable={false}
+          editable={true}
         />
 
         <Text style={styles.label}>Senha:</Text>
@@ -79,16 +111,12 @@ export default function PerfilUsuario() {
             value={password}
             onChangeText={setPassword}
             editable={false}
-            secureTextEntry={!showPassword}
+            // secureTextEntry={!showPassword}
           />
-          <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-            <Ionicons
-              name={showPassword ? "eye-off" : "eye"}
-              size={22}
-              color="gray"
-            />
-          </TouchableOpacity>
         </View>
+        <TouchableOpacity style={styles.botaoSalvar} onPress={handleUpdate}>
+          <Text style={styles.botaoTexto}>Atualizar Dados</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
