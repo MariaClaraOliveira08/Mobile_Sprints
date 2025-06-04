@@ -111,7 +111,7 @@ export default function PerfilUsuario() {
             value={password}
             onChangeText={setPassword}
             editable={false}
-            // secureTextEntry={!showPassword}
+            secureTextEntry={!showPassword}
           />
         </View>
         <TouchableOpacity style={styles.botaoSalvar} onPress={handleUpdate}>
