@@ -42,7 +42,7 @@ export default function PerfilUsuario() {
       setName(usuario.name || "");
       setCpf(usuario.cpf || "");
       setEmail(usuario.email || "");
-      setPassword(usuario.password || "");
+      setPassword("");
     } catch (error) {
       Alert.alert("Erro", "Não foi possível carregar os dados do usuário.");
       console.log("Erro ao carregar usuário:", error);
@@ -50,11 +50,6 @@ export default function PerfilUsuario() {
   }
 
   async function atualizarUser() {
-    if (!name || !cpf || !email || !password) {
-      Alert.alert("Atenção", "Preencha todos os campos obrigatórios.");
-      return;
-    }
-
     try {
       const userId = await SecureStore.getItemAsync("userId");
       if (!userId) {
@@ -62,13 +57,17 @@ export default function PerfilUsuario() {
         return;
       }
 
-      await api.updateUser(userId, { name, cpf, email, password });
+      await api.updateUser(userId, {
+        name,
+        cpf,
+        email,
+        password,
+      });
 
       Alert.alert("Sucesso", "Dados atualizados com sucesso!");
-      setPassword("");
     } catch (error) {
-      console.log("Erro ao atualizar usuário:", error);
-      Alert.alert("Erro", "Não foi possível atualizar os dados.");
+      console.log("Erro ao atualizar usuário:", error.response?.data);
+      Alert.alert("Erro", error.response?.data?.error || "Erro desconhecido");
     }
   }
 
@@ -94,8 +93,10 @@ export default function PerfilUsuario() {
 
               await api.deleteUser(userId);
 
-              Alert.alert("Conta excluída", "Sua conta foi removida com sucesso.");
-
+              Alert.alert(
+                "Conta excluída",
+                "Sua conta foi removida com sucesso."
+              );
               await SecureStore.deleteItemAsync("userId");
               navigation.navigate("Login");
             } catch (error) {
@@ -108,34 +109,21 @@ export default function PerfilUsuario() {
     );
   }
 
-  async function atualizarSenha() {
-    if (!novaSenha || !confirmarSenha) {
-      Alert.alert("Erro", "Preencha todos os campos.");
-      return;
-    }
-
-    if (novaSenha !== confirmarSenha) {
-      Alert.alert("Erro", "As senhas não coincidem.");
-      return;
-    }
-
-    try {
-      const userId = await SecureStore.getItemAsync("userId");
-      if (!userId) {
-        Alert.alert("Erro", "ID do usuário não encontrado.");
-        return;
-      }
-
-      await api.updateUser(userId, { password: novaSenha });
-
-      Alert.alert("Sucesso", "Senha atualizada com sucesso!");
-      setModalVisible(false);
-      setNovaSenha("");
-      setConfirmarSenha("");
-    } catch (error) {
-      console.log("Erro ao atualizar senha:", error);
-      Alert.alert("Erro", "Erro ao atualizar a senha.");
-    }
+  function confirmarLogout() {
+    Alert.alert("Sair", "Deseja realmente sair da sua conta?", [
+      {
+        text: "Cancelar",
+        style: "cancel",
+      },
+      {
+        text: "Sair",
+        style: "destructive",
+        onPress: async () => {
+          await SecureStore.deleteItemAsync("userId");
+          navigation.navigate("Login");
+        },
+      },
+    ]);
   }
 
   return (
@@ -148,45 +136,23 @@ export default function PerfilUsuario() {
 
       <View style={styles.card}>
         <Text style={styles.label}>Nome:</Text>
-        <TextInput
-          style={styles.input}
-          value={name}
-          onChangeText={setName}
-          editable={true}
-        />
+        <TextInput style={styles.input} value={name} onChangeText={setName} />
 
         <Text style={styles.label}>CPF:</Text>
         <TextInput style={styles.input} value={cpf} editable={false} />
 
         <Text style={styles.label}>Email:</Text>
-        <TextInput
-          style={styles.input}
-          value={email}
-          onChangeText={setEmail}
-          editable={true}
-        />
+        <TextInput style={styles.input} value={email} onChangeText={setEmail} />
 
         <Text style={styles.label}>Senha:</Text>
         <View style={styles.inputSenhaContainer}>
           <TextInput
             style={styles.inputSenha}
-            value={password}
+            value={"******"}
             editable={false}
             secureTextEntry={!showPassword}
           />
         </View>
-
-        <TouchableOpacity onPress={() => setModalVisible(true)}>
-          <Text
-            style={{
-              color: "#d93030",
-              marginTop: 10,
-              textDecorationLine: "underline",
-            }}
-          >
-            Alterar senha
-          </Text>
-        </TouchableOpacity>
 
         <TouchableOpacity style={styles.botaoSalvar} onPress={atualizarUser}>
           <Text style={styles.botaoTexto}>Atualizar Dados</Text>
@@ -198,58 +164,14 @@ export default function PerfilUsuario() {
         >
           <Text style={styles.botaoTexto}>Excluir Conta</Text>
         </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.botaoSalvar, { backgroundColor: "#9E9E9E" }]}
+          onPress={confirmarLogout}
+        >
+          <Text style={styles.botaoTexto}>Sair</Text>
+        </TouchableOpacity>
       </View>
-
-      {/* Modal de Alterar Senha */}
-      <Modal
-        visible={modalVisible}
-        animationType="slide"
-        transparent={true}
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContainer}>
-            <Text style={styles.modalTitle}>Alterar Senha</Text>
-
-            <TextInput
-              style={styles.input}
-              placeholder="Nova senha"
-              secureTextEntry
-              value={novaSenha}
-              onChangeText={setNovaSenha}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Confirmar nova senha"
-              secureTextEntry
-              value={confirmarSenha}
-              onChangeText={setConfirmarSenha}
-            />
-
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-                marginTop: 20,
-              }}
-            >
-              <TouchableOpacity
-                style={[styles.botaoSalvar, { backgroundColor: "#aaa" }]}
-                onPress={() => setModalVisible(false)}
-              >
-                <Text style={styles.botaoTexto}>Cancelar</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={styles.botaoSalvar}
-                onPress={atualizarSenha}
-              >
-                <Text style={styles.botaoTexto}>Salvar</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </Modal>
     </View>
   );
 }
@@ -327,24 +249,5 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "bold",
     fontSize: 16,
-  },
-  modalOverlay: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0,0,0,0.5)",
-  },
-  modalContainer: {
-    backgroundColor: "#FFF",
-    padding: 20,
-    borderRadius: 15,
-    width: "85%",
-    alignItems: "center",
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#d93030",
-    marginBottom: 15,
   },
 });

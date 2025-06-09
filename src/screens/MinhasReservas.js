@@ -113,6 +113,11 @@ export default function MinhasReservas() {
                 </View>
               </TouchableOpacity>
             )}
+            ListEmptyComponent={
+              <Text style={styles.emptyMessage}>
+                Nenhuma reserva cadastrada
+              </Text>
+            }
           />
         )}
 
@@ -228,4 +233,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 10,
   },
+  emptyMessage: {
+    color: "#fff"
+  }
 });
