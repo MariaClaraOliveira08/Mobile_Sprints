@@ -11,6 +11,8 @@ import {
   Alert,
 } from "react-native";
 import * as SecureStore from "expo-secure-store";
+import { useFocusEffect } from "@react-navigation/native";
+import { useCallback } from "react";
 import sheets from "../axios/axios";
 import Layout from "../Components/Layout";
 
@@ -37,7 +39,6 @@ export default function MinhasReservas() {
         const id = await SecureStore.getItemAsync("userId");
         if (id) {
           setUserId(id);
-          buscarReservas(id);
         } else {
           Alert.alert("Erro", "Usuário não identificado.");
           setLoading(false);
@@ -50,21 +51,27 @@ export default function MinhasReservas() {
     carregarUserId();
   }, []);
 
-  async function buscarReservas(id) {
-    try {
-      const response = await sheets.getMinhasReservas(id);
-      if (response.data && response.data.reservas) {
-        setReservas(response.data.reservas);
-      } else {
-        setReservas([]);
+  useFocusEffect(
+    useCallback(() => {
+      async function fetchReservas() {
+        if (!userId) return;
+        setLoading(true);
+        try {
+          const response = await sheets.getMinhasReservas(userId);
+          const dados = response.data.reservas ?? [];
+          console.log("Reservas recebidas:", dados);
+          setReservas(dados);
+        } catch (error) {
+          console.error("Erro ao carregar reservas:", error);
+          setReservas([]);
+        } finally {
+          setLoading(false);
+        }
       }
-    } catch (error) {
-      console.log("Erro ao buscar reservas:", error);
-      Alert.alert("Erro", "Não foi possível carregar suas reservas.");
-    } finally {
-      setLoading(false);
-    }
-  }
+
+      fetchReservas();
+    }, [userId])
+  );
 
   function abrirModal(reserva) {
     setReservaSelecionada(reserva);
@@ -76,7 +83,10 @@ export default function MinhasReservas() {
       await sheets.deletarReserva(id);
       Alert.alert("Sucesso", "Reserva excluída!");
       setModalVisible(false);
-      buscarReservas(userId);
+      if (userId) {
+        const response = await sheets.getMinhasReservas(userId);
+        setReservas(response.data.reservas ?? []);
+      }
     } catch (error) {
       console.log("Erro ao excluir reserva:", error);
       Alert.alert("Erro", "Não foi possível excluir.");
@@ -96,14 +106,18 @@ export default function MinhasReservas() {
 
         {loading ? (
           <ActivityIndicator size="large" color="#F77C7C" />
+        ) : reservas.length === 0 ? (
+          <Text style={styles.emptyMessage}>Nenhuma reserva encontrada.</Text>
         ) : (
           <FlatList
             data={reservas}
             keyExtractor={(item) => item.id_schedule.toString()}
+            contentContainerStyle={{ paddingBottom: 40 }}
+            style={{ width: "100%" }}
             renderItem={({ item }) => (
               <TouchableOpacity onPress={() => abrirModal(item)}>
                 <View style={styles.row}>
-                  <Text style={styles.cell}>{item.sala}</Text>
+                  <Text style={styles.cell}>{item.fk_number}</Text>
                   <Text style={styles.cell}>{item.descricao}</Text>
                   <Text style={styles.cell}>
                     {formatarData(item.inicio_periodo)}
@@ -113,11 +127,6 @@ export default function MinhasReservas() {
                 </View>
               </TouchableOpacity>
             )}
-            ListEmptyComponent={
-              <Text style={styles.emptyMessage}>
-                Nenhuma reserva cadastrada
-              </Text>
-            }
           />
         )}
 
@@ -130,9 +139,8 @@ export default function MinhasReservas() {
           <View style={styles.modalOverlay}>
             <View style={styles.modalContainer}>
               <Text style={styles.modalTitle}>Detalhes da Reserva</Text>
-
               <Text style={{ marginBottom: 20 }}>
-                Sala: {reservaSelecionada?.sala}
+                Sala: {reservaSelecionada?.fk_number}
                 {"\n"}
                 Descrição: {reservaSelecionada?.descricao}
                 {"\n"}
@@ -180,8 +188,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#F77C7C",
-    justifyContent: "center",
+    justifyContent: "flex-start",
     alignItems: "center",
+    paddingTop: 20,
+    paddingHorizontal: 16, // adiciona margem lateral no container
   },
   title: {
     fontSize: 24,
@@ -209,7 +219,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 10,
     marginBottom: 10,
-    width: "90%",
+    width: "100%", // ocupa 100% do container, que já tem padding lateral
     justifyContent: "space-between",
   },
   cell: {
@@ -234,6 +244,8 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   emptyMessage: {
-    color: "#fff"
-  }
+    color: "#fff",
+    fontSize: 16,
+    marginTop: 20,
+  },
 });

@@ -8,6 +8,7 @@ import {
   StatusBar,
   Alert,
 } from "react-native";
+import * as SecureStore from "expo-secure-store";
 import sheets from "../axios/axios";
 import Layout from "../Components/Layout";
 import DateTimePicker from "../Components/DateTimePicker";
@@ -35,6 +36,12 @@ export default function CriarReserva({ navigation, route }) {
     }
 
     try {
+      const userId = await SecureStore.getItemAsync("userId");
+      if (!userId) {
+        Alert.alert("Erro", "Usuário não identificado.");
+        return;
+      }
+
       const dataFormatada = data.toISOString().split("T")[0];
 
       const horaInicioStr = horaInicio
@@ -58,7 +65,7 @@ export default function CriarReserva({ navigation, route }) {
       }
 
       const dadosReserva = {
-        fk_id_usuario: 1,
+        fk_id_usuario: userId,
         descricao,
         inicio_periodo: inicio_periodo.toISOString(),
         fim_periodo: fim_periodo.toISOString(),
@@ -68,7 +75,7 @@ export default function CriarReserva({ navigation, route }) {
       setLoading(true);
       const response = await sheets.postReserva(dadosReserva);
       Alert.alert("Sucesso", response.data.message);
-      navigation.goBack();
+      navigation.navigate("MinhasReservas");
     } catch (error) {
       console.log("Erro ao reservar sala:", error);
       Alert.alert("Erro", "Não foi possível realizar a reserva.");
