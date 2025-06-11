@@ -1,14 +1,36 @@
-import React from "react";
+import React, { useState, useCallback } from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
 import Layout from "../Components/Layout";
 import { StatusBar } from "react-native";
+import api from "../axios/axios";
+import * as SecureStore from "expo-secure-store";
+import { useFocusEffect } from "@react-navigation/native";
 
 function Home({ navigation }) {
+  const [totalReservas, setTotalReservas] = useState(0);
+
+  const carregarTotalReservas = async () => {
+    try {
+      const userId = await SecureStore.getItemAsync("userId");
+      if (userId) {
+        const response = await api.totalReservas(userId);
+        setTotalReservas(response.data.total_reservas);
+      }
+    } catch (error) {
+      console.error("Erro ao buscar total de reservas:", error);
+    }
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      carregarTotalReservas();
+    }, [])
+  );
+
   return (
     <Layout>
       <StatusBar hidden={false} />
       <View style={styles.container}>
-        {/* Botões no topo */}
         <View style={styles.buttonRow}>
           <TouchableOpacity
             style={styles.button}
@@ -21,11 +43,10 @@ function Home({ navigation }) {
             style={styles.button}
             onPress={() => navigation.navigate("MinhasReservas")}
           >
-            <Text style={styles.buttonText}>Reservas</Text>
+            <Text style={styles.buttonText}>Reservas: {totalReservas}</Text>
           </TouchableOpacity>
         </View>
 
-        {/* Título e subtítulo logo abaixo dos botões */}
         <Text style={styles.title}>BEM-VINDO AO SITE!</Text>
         <View style={styles.line1}></View>
         <Text style={styles.subtitle}>SENAI FRANCA–SP</Text>
@@ -34,9 +55,7 @@ function Home({ navigation }) {
         <Image
           source={require("../../assets/escola.jpg")}
           style={styles.imagem}
-        ></Image>
-
-        {/* Linha abaixo do título e subtítulo */}
+        />
       </View>
     </Layout>
   );
@@ -52,11 +71,11 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingTop: 40,
     paddingHorizontal: 20,
-    alignItems: "flex-start", // alinha à esquerda
+    alignItems: "flex-start",
   },
   buttonRow: {
     flexDirection: "row",
-    alignSelf: "center", // botões ainda centralizados
+    alignSelf: "center",
     marginBottom: 20,
     gap: 12,
   },
@@ -76,7 +95,7 @@ const styles = StyleSheet.create({
     fontStyle: "italic",
     color: "#fff",
     marginBottom: 4,
-    textAlign: "left", // garante alinhamento do texto
+    textAlign: "left",
   },
   subtitle: {
     fontSize: 16,
@@ -84,17 +103,16 @@ const styles = StyleSheet.create({
     color: "#fff",
     textAlign: "left",
   },
-  // Estilo da linha abaixo do subtítulo
   line1: {
     width: "49%",
     height: 2,
-    backgroundColor: "#fff", // cor da linha
+    backgroundColor: "#fff",
   },
   line2: {
     width: "30%",
     height: 1,
-    backgroundColor: "#fff", // cor da linha
-    marginTop: 1, // espaço acima da linha
+    backgroundColor: "#fff",
+    marginTop: 1,
   },
 });
 

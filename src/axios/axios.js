@@ -44,6 +44,7 @@ const sheets = {
   getUsuario: (userId) => api.get(`/user/${userId}`),
   deletarReserva: (id) => api.delete(`/schedules/${id}`),
   deleteUser: (userId) => api.delete(`/users/${userId}`),
+  totalReservas: (userId) => api.post(`/total/reservas/usuario/${userId}`),
 };
 
 export default sheets;

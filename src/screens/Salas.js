@@ -46,7 +46,7 @@ export default function SalasDisponiveis({ navigation }) {
   async function buscarHorariosDisponiveis() {
     if (!dataSelecionada || !salaSelecionada) return;
 
-    const dataFormatada = formatarDataAPI(dataSelecionada); // <-- formato para API (YYYY-MM-DD)
+    const dataFormatada = formatarDataAPI(dataSelecionada);
 
     try {
       const response = await api.getHorariosDisponiveisPorSalaEData(
@@ -65,10 +65,6 @@ export default function SalasDisponiveis({ navigation }) {
   }
 
   function renderHorarios() {
-    if (horarios.length === 0) {
-      return <Text style={styles.noHorarios}>Nenhum horário disponível</Text>;
-    }
-
     return horarios.map((horario, index) => (
       <TouchableOpacity
         key={index}
@@ -76,7 +72,7 @@ export default function SalasDisponiveis({ navigation }) {
         onPress={() => {
           navigation.navigate("Reservar Sala", {
             salaId: salaSelecionada.number,
-            data: formatarDataAPI(dataSelecionada), // <-- formato para API
+            data: formatarDataAPI(dataSelecionada),
             horaInicio: horario.start_time,
             horaFim: horario.end_time,
           });
@@ -194,7 +190,6 @@ export default function SalasDisponiveis({ navigation }) {
               />
 
               <ScrollView style={{ maxHeight: 200, marginTop: 10 }}>
-                <Text style={styles.horariosTitle}>Horários disponíveis:</Text>
                 {renderHorarios()}
               </ScrollView>
 

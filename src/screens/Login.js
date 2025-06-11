@@ -46,10 +46,9 @@ export default function Login() {
 
     try {
       const response = await api.postLogin(user);
-      console.log("Resposta completa do backend:", response.data);
 
       const token = response.data.token;
-      const userId = response.data.user?.id_usuario; 
+      const userId = response.data.user?.id_usuario;
 
       if (!token) {
         Alert.alert("Erro", "Token não recebido. Verifique suas credenciais.");
@@ -70,7 +69,7 @@ export default function Login() {
       }
 
       Alert.alert("Sucesso", response.data.message || "Login realizado!");
-      navigation.navigate("Home");
+      navigation.navigate("Home", { userId });
     } catch (error) {
       console.log("Erro no login:", error.response);
       Alert.alert(

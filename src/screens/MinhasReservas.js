@@ -191,7 +191,7 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
     alignItems: "center",
     paddingTop: 20,
-    paddingHorizontal: 16, // adiciona margem lateral no container
+    paddingHorizontal: 16, 
   },
   title: {
     fontSize: 24,
@@ -219,7 +219,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 10,
     marginBottom: 10,
-    width: "100%", // ocupa 100% do container, que já tem padding lateral
+    width: "100%", 
     justifyContent: "space-between",
   },
   cell: {
