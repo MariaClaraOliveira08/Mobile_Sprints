@@ -13,11 +13,11 @@ import {
 import * as SecureStore from "expo-secure-store";
 import { useFocusEffect } from "@react-navigation/native";
 import { useCallback } from "react";
-import sheets from "../axios/axios";
+import api from "../axios/axios";
 import Layout from "../Components/Layout";
 
 function formatarData(dataString) {
-  const data = new Date(dataString);
+  const data = new Date(dataString); //converte a string em um objeto data 
   const dia = data.toLocaleDateString("pt-BR");
   const hora = data.toLocaleTimeString("pt-BR", {
     hour: "2-digit",
@@ -36,9 +36,9 @@ export default function MinhasReservas() {
   useEffect(() => {
     async function carregarUserId() {
       try {
-        const id = await SecureStore.getItemAsync("userId");
+        const id = await SecureStore.getItemAsync("userId"); //recupera o userId armazenado 
         if (id) {
-          setUserId(id);
+          setUserId(id); //atualiza o estado local com o userId recuperado
         } else {
           Alert.alert("Erro", "Usuário não identificado.");
           setLoading(false);
@@ -54,23 +54,23 @@ export default function MinhasReservas() {
   useFocusEffect(
     useCallback(() => {
       async function fetchReservas() {
-        if (!userId) return;
+        if (!userId) return; // para a execução, caso o userId seja null
         setLoading(true);
         try {
-          const response = await sheets.getMinhasReservas(userId);
-          const dados = response.data.reservas ?? [];
+          const response = await api.getMinhasReservas(userId); // faz a requisição para buscar as reservas do usuário
+          const dados = response.data.reservas ?? [];  // pega as reservas ou um array vazio se não existir reservas
           console.log("Reservas recebidas:", dados);
-          setReservas(dados);
+          setReservas(dados); // atualiza o estado com as reservas recebidas
         } catch (error) {
           console.error("Erro ao carregar reservas:", error);
-          setReservas([]);
+          setReservas([]); //limpa a lista de reservas
         } finally {
           setLoading(false);
         }
       }
 
       fetchReservas();
-    }, [userId])
+    }, [userId]) 
   );
 
   function abrirModal(reserva) {
@@ -80,12 +80,12 @@ export default function MinhasReservas() {
 
   async function excluirReserva(id) {
     try {
-      await sheets.deletarReserva(id);
+      await api.deletarReserva(id); // chamada da api para deletar a reserva com id
       Alert.alert("Sucesso", "Reserva excluída!");
       setModalVisible(false);
       if (userId) {
-        const response = await sheets.getMinhasReservas(userId);
-        setReservas(response.data.reservas ?? []);
+        const response = await api.getMinhasReservas(userId); // faz a requisição para buscar as reservas do usuário
+        setReservas(response.data.reservas ?? []); // atualiza o estado com a lista de reservas 
       }
     } catch (error) {
       console.log("Erro ao excluir reserva:", error);
@@ -121,7 +121,7 @@ export default function MinhasReservas() {
                   <Text style={styles.cell}>{item.descricao}</Text>
                   <Text style={styles.cell}>
                     {formatarData(item.inicio_periodo)}
-                    {"\n"}até{"\n"}
+                    {"\n"}até{"\n"} 
                     {formatarData(item.fim_periodo)}
                   </Text>
                 </View>
@@ -143,7 +143,7 @@ export default function MinhasReservas() {
                 Sala: {reservaSelecionada?.fk_number}
                 {"\n"}
                 Descrição: {reservaSelecionada?.descricao}
-                {"\n"}
+                {"\n"} 
                 Período:{"\n"}
                 {reservaSelecionada
                   ? `${formatarData(

@@ -7,14 +7,14 @@ import * as SecureStore from "expo-secure-store";
 import { useFocusEffect } from "@react-navigation/native";
 
 function Home({ navigation }) {
-  const [totalReservas, setTotalReservas] = useState(0);
+  const [totalReservas, setTotalReservas] = useState(0); // constante que armazena o estado
 
-  const carregarTotalReservas = async () => {
+  async function carregarTotalReservas() {
     try {
-      const userId = await SecureStore.getItemAsync("userId");
+      const userId = await SecureStore.getItemAsync("userId");  //recupera o userId armazenado
       if (userId) {
-        const response = await api.totalReservas(userId);
-        setTotalReservas(response.data.total_reservas);
+        const response = await api.totalReservas(userId); //requisição para a api para obter o total de reservas do usuário
+        setTotalReservas(response.data.total_reservas); //atualiza o estado com o total de reservas retornado pela api
       }
     } catch (error) {
       console.error("Erro ao buscar total de reservas:", error);
@@ -23,7 +23,7 @@ function Home({ navigation }) {
 
   useFocusEffect(
     useCallback(() => {
-      carregarTotalReservas();
+      carregarTotalReservas(); //chama a função para carregar o total de reservas
     }, [])
   );
 

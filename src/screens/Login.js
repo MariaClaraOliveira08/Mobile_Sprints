@@ -25,7 +25,7 @@ export default function Login() {
 
   async function saveToken(token) {
     try {
-      await SecureStore.setItemAsync("token", token);
+      await SecureStore.setItemAsync("token", token); //armazena o token no segurestore
       console.log("Token salvo com sucesso!");
     } catch (error) {
       console.error("Erro ao salvar token:", error);
@@ -34,7 +34,7 @@ export default function Login() {
 
   async function saveUserId(userId) {
     try {
-      await SecureStore.setItemAsync("userId", userId.toString());
+      await SecureStore.setItemAsync("userId", userId.toString()); //armazena o id como string no segurestore
       console.log("ID do usuário salvo com sucesso!");
     } catch (error) {
       console.error("Erro ao salvar ID do usuário:", error);
@@ -64,18 +64,17 @@ export default function Login() {
 
       await saveToken(token);
 
-      if (userId !== undefined && userId !== null) {
-        await saveUserId(userId);
+      if (userId !== undefined && userId !== null) { // verifica se o id está definido e se não está nulo
+        await saveUserId(userId); //chamada da função para salvar o userId
       }
 
-      Alert.alert("Sucesso", response.data.message || "Login realizado!");
+      Alert.alert("Sucesso", response.data.message);
       navigation.navigate("Home", { userId });
     } catch (error) {
       console.log("Erro no login:", error.response);
       Alert.alert(
         "Erro",
-        error.response?.data?.error || "Erro inesperado no login"
-      );
+        error.response?.data?.error);
     }
   }
 

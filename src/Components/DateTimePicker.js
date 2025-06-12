@@ -3,7 +3,7 @@ import { View, Button } from "react-native";
 import DateTimePicker from "react-native-modal-datetime-picker";
 
 const DateTimePickerDefault = ({ type, buttonTitle, setValue }) => {
-  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+  const [isDatePickerVisible, setDatePickerVisibility] = useState(false); //estado da visibilidade do DateTimePicker
 
   const showDatePicker = () => {
     setDatePickerVisibility(true);
@@ -14,7 +14,7 @@ const DateTimePickerDefault = ({ type, buttonTitle, setValue }) => {
   };
 
   const handleConfirm = (data) => {
-    setValue(data); // Corrigido: atualiza diretamente
+    setValue(data); //atualiza o valor da data/hora 
     hideDatePicker();
   };
 

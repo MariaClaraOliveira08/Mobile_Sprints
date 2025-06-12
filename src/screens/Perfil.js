@@ -22,18 +22,18 @@ export default function PerfilUsuario() {
   const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
-    carregarDadosUsuario();
+    carregarDadosUsuario(); 
   }, []);
 
   async function carregarDadosUsuario() {
     try {
-      const userId = await SecureStore.getItemAsync("userId");
+      const userId = await SecureStore.getItemAsync("userId"); //recupera o id do usuário armazenado
       if (!userId) {
         Alert.alert("Erro", "ID do usuário não encontrado.");
         return;
       }
 
-      const response = await api.getUsuario(userId);
+      const response = await api.getUsuario(userId); //faz requisição para a api para obter os dados do usuário pelo userId
       const usuario = response.data.user;
 
       setName(usuario.name || "");
@@ -48,7 +48,7 @@ export default function PerfilUsuario() {
 
   async function atualizarUser() {
     try {
-      const userId = await SecureStore.getItemAsync("userId");
+      const userId = await SecureStore.getItemAsync("userId"); //recupera o id do usuário armazenado
       if (!userId) {
         Alert.alert("Erro", "ID do usuário não encontrado.");
         return;
@@ -64,7 +64,7 @@ export default function PerfilUsuario() {
       Alert.alert("Sucesso", "Dados atualizados com sucesso!");
     } catch (error) {
       console.log("Erro ao atualizar usuário:", error.response?.data);
-      Alert.alert("Erro", error.response?.data?.error || "Erro desconhecido");
+      Alert.alert("Erro", error.response?.data?.error);
     }
   }
 
@@ -88,13 +88,13 @@ export default function PerfilUsuario() {
                 return;
               }
 
-              await api.deleteUser(userId);
+              await api.deleteUser(userId); // chamada da api para excluir o usuário 
 
               Alert.alert(
                 "Conta excluída",
                 "Sua conta foi removida com sucesso."
               );
-              await SecureStore.deleteItemAsync("userId");
+              await SecureStore.deleteItemAsync("userId"); // remove o userId do armazenamento 
               navigation.navigate("Login");
             } catch (error) {
               console.log("Erro ao excluir usuário:", error);
