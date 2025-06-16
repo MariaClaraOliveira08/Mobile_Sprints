@@ -69,12 +69,10 @@ export default function Login() {
       }
 
       Alert.alert("Sucesso", response.data.message);
-      navigation.navigate("Home", { userId });
+      navigation.navigate("Home");
     } catch (error) {
       console.log("Erro no login:", error.response);
-      Alert.alert(
-        "Erro",
-        error.response?.data?.error);
+      Alert.alert("Erro", error.response?.data?.error);
     }
   }
 
