@@ -52,7 +52,7 @@ export default function MinhasReservas() {
   }, []);
 
   useFocusEffect(
-    useCallback(() => {
+    useCallback(() => { // a função não será recriada a cada, renderização, a menos que suas dependencias mudem
       async function fetchReservas() {
         if (!userId) return; // para a execução, caso o userId seja null
         setLoading(true);
