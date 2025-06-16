@@ -8,6 +8,7 @@ const api = axios.create({
   },
 });
 
+//npx expo install expo-secure-store
 // Intercepta requisições para adicionar token e tratar erros
 api.interceptors.request.use(
   async (config) => {

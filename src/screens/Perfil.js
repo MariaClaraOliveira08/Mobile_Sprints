@@ -19,10 +19,9 @@ export default function PerfilUsuario() {
   const [cpf, setCpf] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
-    carregarDadosUsuario(); 
+    carregarDadosUsuario();
   }, []);
 
   async function carregarDadosUsuario() {
@@ -147,7 +146,6 @@ export default function PerfilUsuario() {
             style={styles.inputSenha}
             value={"******"}
             editable={false}
-            secureTextEntry={!showPassword}
           />
         </View>
 

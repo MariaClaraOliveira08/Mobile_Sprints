@@ -1,3 +1,5 @@
+//npm install @react-native-community/datetimepicker
+//npm install react-native-modal-datetime-picker
 import React, { useState } from "react";
 import { View, Button } from "react-native";
 import DateTimePicker from "react-native-modal-datetime-picker";
